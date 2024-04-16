@@ -22,7 +22,6 @@ export default function Proposals() {
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const canCreate = useCanCreateProposal();
-  const { tokenSupply } = useVotingToken();
   const [currentPage, setCurrentPage] = useState(0);
 
   const {
@@ -70,11 +69,7 @@ export default function Proposals() {
       <If condition={proposalCount}>
         <Then>
           {visibleProposalIds.map((id) => (
-            <ProposalCard
-              key={id}
-              proposalId={BigInt(id)}
-              tokenSupply={tokenSupply || BigInt("0")}
-            />
+            <ProposalCard key={id} proposalId={BigInt(id)} />
           ))}
           <div className="w-full flex flex-row justify-end gap-2 mt-4 mb-10">
             <Button
