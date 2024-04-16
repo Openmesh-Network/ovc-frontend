@@ -1,16 +1,16 @@
-import { deployment } from "@/ovc-indexer/contracts/deployment";
-import { erc721Abi } from "viem";
+import { VerifiedContributorContract } from "@/ovc-indexer/contracts/VerifiedContributor";
 import { useReadContract } from "wagmi";
 
-export function useVotingToken() {
+export function useVotingToken(blockNumber?: bigint) {
   const {
     data: tokenSupply,
     isError: isError1,
     isLoading: isLoading1,
   } = useReadContract({
-    address: deployment.departments.verifiedContributor.verifiedContributor,
-    abi: erc721Abi,
-    functionName: "totalSupply",
+    address: VerifiedContributorContract.address,
+    abi: VerifiedContributorContract.abi,
+    functionName: "getPastTotalSupply",
+    args: [blockNumber ?? BigInt(0)],
   });
 
   const {
@@ -18,13 +18,13 @@ export function useVotingToken() {
     isError: isError2,
     isLoading: isLoading2,
   } = useReadContract({
-    address: deployment.departments.verifiedContributor.verifiedContributor,
-    abi: erc721Abi,
+    address: VerifiedContributorContract.address,
+    abi: VerifiedContributorContract.abi,
     functionName: "symbol",
   });
 
   return {
-    address: deployment.departments.verifiedContributor.verifiedContributor,
+    address: VerifiedContributorContract.address,
     tokenSupply,
     symbol: tokenSymbol,
     status: {

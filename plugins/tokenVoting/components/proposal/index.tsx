@@ -5,6 +5,7 @@ import { Card, Tag } from "@aragon/ods";
 import * as DOMPurify from "dompurify";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { If } from "@/components/if";
+import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY =
@@ -12,11 +13,11 @@ const DEFAULT_PROPOSAL_METADATA_SUMMARY =
 
 type ProposalInputs = {
   proposalId: bigint;
-  tokenSupply: bigint;
 };
 
 export default function ProposalCard(props: ProposalInputs) {
   const { proposal, status } = useProposal(props.proposalId.toString());
+  const { tokenSupply } = useVotingToken(proposal?.parameters.snapshotBlock);
 
   const showLoading = getShowProposalLoading(proposal, status);
 
@@ -59,7 +60,7 @@ export default function ProposalCard(props: ProposalInputs) {
   }
 
   const { variant: statusVariant, label: statusLabel } =
-    getProposalStatusVariant(proposal, props.tokenSupply);
+    getProposalStatusVariant(proposal, tokenSupply);
 
   return (
     <Link href={`#/proposals/${props.proposalId}`} className="w-full">

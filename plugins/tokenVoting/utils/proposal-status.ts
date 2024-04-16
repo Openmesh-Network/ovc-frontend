@@ -3,8 +3,11 @@ export const RATIO_BASE = 1_000_000;
 
 export function getProposalStatusVariant(
   proposal: Proposal,
-  tokenSupply: bigint
+  tokenSupply?: bigint
 ) {
+  // Impossible to pass without any voters
+  if (!tokenSupply) return { variant: "critical", label: "Defeated" };
+
   // Terminal cases
   if (!proposal?.tally) return { variant: "info", label: "(Loading)" };
   else if (proposal.executed) return { variant: "primary", label: "Executed" };

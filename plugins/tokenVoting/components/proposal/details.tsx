@@ -17,7 +17,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
   minVotingPower,
   snapshotBlock,
 }) => {
-  const { tokenSupply, symbol } = useVotingToken();
+  const { tokenSupply, symbol } = useVotingToken(snapshotBlock);
   let threshold = BigInt(0);
   if (supportThreshold && tokenSupply) {
     threshold = (BigInt(supportThreshold) * tokenSupply) / PERCENT_BASE;

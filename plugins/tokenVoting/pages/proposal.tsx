@@ -27,7 +27,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     proposalId,
     true
   );
-  const { tokenSupply } = useVotingToken();
+  const { tokenSupply } = useVotingToken(proposal?.parameters.snapshotBlock);
   const {
     voteProposal,
     votingStatus,
