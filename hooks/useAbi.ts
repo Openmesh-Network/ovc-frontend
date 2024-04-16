@@ -1,25 +1,23 @@
-import { Address } from "viem";
+import { Address, PublicClient } from "viem";
 import { whatsabi } from "@shazow/whatsabi";
-import { usePublicClient } from "wagmi";
 import { AbiFunction } from "abitype";
 import { useQuery } from "@tanstack/react-query";
 import { isAddress } from "@/utils/evm";
-import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
 import { getImplementation, isProxyContract } from "@/utils/proxies";
-import { ChainName } from "@/utils/chains";
 
-const CHAIN_NAME = PUB_CHAIN.name.toLowerCase() as ChainName;
-
-export const useAbi = (contractAddress: Address) => {
+export const useAbi = (
+  contractAddress: Address,
+  publicClient: PublicClient
+) => {
   const { addAlert } = useAlerts();
-  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
+  const chainId = publicClient.chain?.id || 0;
 
   const { data: implementationAddress, isLoading: isLoadingImpl } =
     useQuery<Address | null>({
-      queryKey: ["proxy-check", contractAddress, !!publicClient],
+      queryKey: ["proxy-check", contractAddress, chainId],
       queryFn: () => {
-        if (!contractAddress || !publicClient) return null;
+        if (!contractAddress) return null;
 
         return isProxyContract(publicClient, contractAddress)
           .then((isProxy) => {
@@ -44,17 +42,19 @@ export const useAbi = (contractAddress: Address) => {
     isLoading,
     error,
   } = useQuery<AbiFunction[], Error>({
-    queryKey: ["abi", resolvedAddress || "", !!publicClient],
+    queryKey: ["abi", resolvedAddress || "", chainId],
     queryFn: () => {
-      if (!resolvedAddress || !isAddress(resolvedAddress) || !publicClient) {
+      if (!resolvedAddress || !isAddress(resolvedAddress)) {
+        console.log("AH");
+        console.log(resolvedAddress);
+        console.log(publicClient);
         return Promise.resolve([]);
       }
 
-      const abiLoader = getEtherscanAbiLoader();
       return whatsabi
         .autoload(resolvedAddress, {
           provider: publicClient,
-          abiLoader,
+          abiLoader: getEtherscanAbiLoader(chainId),
           followProxies: false,
           enableExperimentalMetadata: true,
         })
@@ -107,31 +107,21 @@ export const useAbi = (contractAddress: Address) => {
   };
 };
 
-function getEtherscanAbiLoader() {
-  switch (CHAIN_NAME) {
-    case "mainnet":
+function getEtherscanAbiLoader(chainId: number) {
+  switch (chainId) {
+    case 1:
+      return new whatsabi.loaders.EtherscanABILoader();
+    case 137:
       return new whatsabi.loaders.EtherscanABILoader({
-        apiKey: PUB_ETHERSCAN_API_KEY,
-      });
-    case "polygon":
-      return new whatsabi.loaders.EtherscanABILoader({
-        apiKey: PUB_ETHERSCAN_API_KEY,
         baseURL: "https://api.polygonscan.com/api",
       });
-    case "arbitrum":
+    case 421614:
       return new whatsabi.loaders.EtherscanABILoader({
-        apiKey: PUB_ETHERSCAN_API_KEY,
-        baseURL: "https://api.arbiscan.io/api",
+        baseURL: "https://api-sepolia.arbiscan.io/api",
       });
-    case "sepolia":
+    case 11155111:
       return new whatsabi.loaders.EtherscanABILoader({
-        apiKey: PUB_ETHERSCAN_API_KEY,
         baseURL: "https://api-sepolia.etherscan.io/api",
-      });
-    case "mumbai":
-      return new whatsabi.loaders.EtherscanABILoader({
-        apiKey: PUB_ETHERSCAN_API_KEY,
-        baseURL: "https://api-mumbai.polygonscan.com/api",
       });
     default:
       throw new Error("Unknown chain");

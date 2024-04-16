@@ -8,11 +8,12 @@ import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { digestPagination } from "@/utils/pagination";
 import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useRouter } from "next/router";
+import { deployment } from "@/ovc-indexer/contracts/deployment";
+import { defaultChain } from "@/config/wagmi-config";
 
 export default function Proposals() {
   const { isConnected } = useAccount();
@@ -29,7 +30,10 @@ export default function Proposals() {
     isLoading,
     refetch,
   } = useReadContract({
-    address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+    chainId: defaultChain.id,
+    address:
+      deployment.departments.departmentDaos.departmentFactory.departmentOwner
+        .tokenVoting,
     abi: TokenVotingAbi,
     functionName: "proposalCount",
   });

@@ -1,31 +1,43 @@
-import { Address } from "viem";
+import { Address, erc721Abi, zeroAddress } from "viem";
 import { useState, useEffect } from "react";
-import { useBalance, useAccount, useReadContracts } from "wagmi";
+import {
+  useBalance,
+  useAccount,
+  useReadContracts,
+  useReadContract,
+} from "wagmi";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
-import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { defaultChain } from "@/config/wagmi-config";
+import { deployment } from "@/ovc-indexer/contracts/deployment";
 
 export function useCanCreateProposal() {
   const { address } = useAccount();
   const [minProposerVotingPower, setMinProposerVotingPower] =
     useState<bigint>();
   const [votingToken, setVotingToken] = useState<Address>();
-  const { data: balance } = useBalance({
-    address,
-    token: votingToken,
-    chainId: PUB_CHAIN.id,
+  const { data: balance } = useReadContract({
+    abi: erc721Abi,
+    address: votingToken,
+    functionName: "balanceOf",
+    args: [address ?? zeroAddress],
+    chainId: defaultChain.id,
   });
 
   const { data: contractReads } = useReadContracts({
     contracts: [
       {
-        chainId: PUB_CHAIN.id,
-        address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+        chainId: defaultChain.id,
+        address:
+          deployment.departments.departmentDaos.departmentFactory
+            .departmentOwner.tokenVoting,
         abi: TokenVotingAbi,
         functionName: "minProposerVotingPower",
       },
       {
-        chainId: PUB_CHAIN.id,
-        address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+        chainId: defaultChain.id,
+        address:
+          deployment.departments.departmentDaos.departmentFactory
+            .departmentOwner.tokenVoting,
         abi: TokenVotingAbi,
         functionName: "getVotingToken",
       },
@@ -42,7 +54,7 @@ export function useCanCreateProposal() {
   if (!address) return false;
   else if (!minProposerVotingPower) return true;
   else if (!balance) return false;
-  else if (balance?.value >= minProposerVotingPower) return true;
+  else if (balance >= minProposerVotingPower) return true;
 
   return false;
 }

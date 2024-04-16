@@ -3,7 +3,8 @@ import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { deployment } from "@/ovc-indexer/contracts/deployment";
+import { defaultChain } from "@/config/wagmi-config";
 
 export function useProposalVoting(proposalId: string) {
   const { reload } = useRouter();
@@ -52,8 +53,11 @@ export function useProposalVoting(proposalId: string) {
 
   const voteProposal = (votingOption: number, autoExecute: boolean = false) => {
     voteWrite({
+      chainId: defaultChain.id,
       abi: TokenVotingAbi,
-      address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+      address:
+        deployment.departments.departmentDaos.departmentFactory.departmentOwner
+          .tokenVoting,
       functionName: "vote",
       args: [proposalId, votingOption, autoExecute],
     });

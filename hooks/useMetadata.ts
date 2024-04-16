@@ -1,14 +1,25 @@
-import { fetchJsonFromIpfs } from "@/utils/ipfs";
+import {
+  FetchMetadataRequest,
+  FetchMetadataResponse,
+} from "@/pages/api/fetchMetadata";
 import { JsonValue } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-export function useMetadata<T = JsonValue>(ipfsUri?: string) {
+export function useMetadata<T = JsonValue>(uri?: string) {
   const { data, isLoading, isSuccess, error } = useQuery<T, Error>({
-    queryKey: ["ipfs", ipfsUri || ""],
+    queryKey: [uri || ""],
     queryFn: () => {
-      if (!ipfsUri) return Promise.resolve("");
+      if (!uri) return Promise.resolve("");
 
-      return fetchJsonFromIpfs(ipfsUri);
+      const request: FetchMetadataRequest = {
+        url: uri,
+      };
+      return axios
+        .post("/api/fetchMetadata", request)
+        .then((response) => response.data as FetchMetadataResponse)
+        .then((response) => response.content)
+        .then(JSON.parse);
     },
     retry: true,
     refetchOnMount: false,

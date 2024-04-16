@@ -7,7 +7,8 @@ import {
   VoteCastResponse,
 } from "@/plugins/tokenVoting/utils/types";
 import { usePublicClient } from "wagmi";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { defaultChain } from "@/config/wagmi-config";
+import { deployment } from "@/ovc-indexer/contracts/deployment";
 
 const event = getAbiItem({ abi: TokenVotingAbi, name: "VoteCast" });
 
@@ -15,7 +16,7 @@ export function useProposalVoteList(
   proposalId: string,
   proposal: Proposal | null
 ) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId: defaultChain.id });
   const [proposalLogs, setLogs] = useState<VoteCastEvent[]>([]);
 
   async function getLogs() {
@@ -23,7 +24,9 @@ export function useProposalVoteList(
     else if (!publicClient) return;
 
     const logs: VoteCastResponse[] = (await publicClient.getLogs({
-      address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+      address:
+        deployment.departments.departmentDaos.departmentFactory.departmentOwner
+          .tokenVoting,
       event: event as any,
       args: {
         proposalId,

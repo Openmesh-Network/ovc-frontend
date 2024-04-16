@@ -6,9 +6,9 @@ import { useState } from "react";
 import { plugins } from "@/plugins";
 import { ParsedUrlQuery } from "querystring";
 import { resolveQueryParam } from "@/utils/query";
-import { PUB_DISCORD_URL } from "@/constants";
 import { Else, If, Then } from "./if";
 import { CloseIcon, MenuIcon } from "./icons";
+import { siteConfig } from "@/config/site";
 
 const Sidebar = () => {
   const { pathname, query } = useRouter();
@@ -50,18 +50,18 @@ const Sidebar = () => {
         <div className="w-full">
           <div className="w-full flex items-center pt-14 py-3 px-3 md:pt-6">
             <Image
-              src="/logo-bw-lg.png"
+              src="/logo.png"
               width="60"
               height="60"
               className="w-8 my-1 mx-4"
-              alt="Aragonette"
+              alt="Openmesh"
             />
             <Link
               href="/"
               className={`block py-1 leading-tight font-semibold text-xl text-neutral-700`}
               aria-current="page"
             >
-              Aragonette
+              Verified Contributor
             </Link>
           </div>
           <MenuList isHome={isHome} setIsOpen={setIsOpen} pluginId={pluginId} />
@@ -125,7 +125,7 @@ const MenuList = ({
           } rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
         >
           <Link
-            href={"/plugins/" + plugin.id + "/#/"}
+            href={"/plugins/" + plugin.id + "/"}
             className="flex items-center focus:outline-none focus:ring-2 focus:ring-white w-full p-3"
           >
             <Icon
@@ -144,7 +144,7 @@ const MenuList = ({
         className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
       >
         <Link
-          href={PUB_DISCORD_URL}
+          href={siteConfig.links.discord}
           target="_blank"
           className="flex items-center w-full p-3"
         >
@@ -174,7 +174,7 @@ const PoweredByAragon = () => {
             &nbsp;Aragon
           </span>
           <Image
-            src="/logo.png"
+            src="/aragon-logo.png"
             width="24"
             height="20"
             className=""

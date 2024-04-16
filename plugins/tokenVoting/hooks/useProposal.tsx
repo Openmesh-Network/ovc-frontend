@@ -9,8 +9,9 @@ import {
   ProposalParameters,
   Tally,
 } from "@/plugins/tokenVoting/utils/types";
-import { PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
+import { deployment } from "@/ovc-indexer/contracts/deployment";
+import { defaultChain } from "@/config/wagmi-config";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -30,7 +31,7 @@ const ProposalCreatedEvent = getAbiItem({
 });
 
 export function useProposal(proposalId: string, autoRefresh = false) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId: defaultChain.id });
   const [proposalCreationEvent, setProposalCreationEvent] =
     useState<ProposalCreatedLogResponse["args"]>();
   const [metadataUri, setMetadata] = useState<string>();
@@ -43,7 +44,10 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     fetchStatus: proposalFetchStatus,
     refetch: proposalRefetch,
   } = useReadContract<typeof TokenVotingAbi, "getProposal", any[]>({
-    address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+    chainId: defaultChain.id,
+    address:
+      deployment.departments.departmentDaos.departmentFactory.departmentOwner
+        .tokenVoting,
     abi: TokenVotingAbi,
     functionName: "getProposal",
     args: [proposalId],
@@ -60,7 +64,9 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
     publicClient
       .getLogs({
-        address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+        address:
+          deployment.departments.departmentDaos.departmentFactory
+            .departmentOwner.tokenVoting,
         event: ProposalCreatedEvent as any,
         args: {
           proposalId: proposalId,

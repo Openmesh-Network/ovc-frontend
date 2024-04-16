@@ -1,6 +1,4 @@
-import dayjs from "dayjs";
 import { ReactNode } from "react";
-import { formatEther } from "viem";
 import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
 import { compactNumber } from "@/utils/numbers";
 
@@ -38,7 +36,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
         </h2>
         <div className="items-right text-right flex-wrap">
           <span className="text-xl font-semibold">
-            {compactNumber(formatEther(threshold))}
+            {compactNumber(Number(threshold), 0)}
           </span>{" "}
           <span>{symbol ?? ""}</span>
           <p className="text-neutral-600">
@@ -56,7 +54,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({
         </h2>
         <div className="items-right text-right flex-wrap">
           <span className="text-xl font-semibold">
-            {minVotingPower ? compactNumber(formatEther(minVotingPower)) : null}
+            {minVotingPower ? compactNumber(Number(minVotingPower), 0) : null}
           </span>{" "}
           <span>{symbol ?? ""}</span>
           <p className="text-neutral-600">

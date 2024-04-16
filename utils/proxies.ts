@@ -8,7 +8,6 @@ import {
   parseAbi,
   toHex,
 } from "viem";
-import { PUB_CHAIN } from "@/constants";
 
 const proxyAbi1 = parseAbi([
   "function implementation() external view returns (address)",
@@ -29,7 +28,6 @@ export function isProxyContract(
       abi: proxyAbi1,
       functionName: "implementation",
       args: [],
-      chain: PUB_CHAIN,
     })
     .then(() => true)
     .catch((e: any) => {

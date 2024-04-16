@@ -1,0 +1,9 @@
+[submodule "ovc-indexer"]
+	path = ovc-indexer
+	url = https://github.com/Plopmenz/ovc-indexer
+[submodule "crosschain-account"]
+	path = crosschain-account
+	url = https://github.com/Plopmenz/crosschain-account
+[submodule "trustless-indexer"]
+	path = trustless-indexer
+	url = https://github.com/Plopmenz/trustless-indexer

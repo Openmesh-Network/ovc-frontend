@@ -7,7 +7,8 @@ import {
 import { TokenVotingAbi } from "../artifacts/TokenVoting.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
-import { PUB_CHAIN, PUB_TOKEN_VOTING_PLUGIN_ADDRESS } from "@/constants";
+import { defaultChain } from "@/config/wagmi-config";
+import { deployment } from "@/ovc-indexer/contracts/deployment";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
@@ -18,9 +19,11 @@ export function useProposalExecute(proposalId: string) {
     isError: isCanVoteError,
     isLoading: isCanVoteLoading,
   } = useReadContract({
-    address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+    address:
+      deployment.departments.departmentDaos.departmentFactory.departmentOwner
+        .tokenVoting,
     abi: TokenVotingAbi,
-    chainId: PUB_CHAIN.id,
+    chainId: defaultChain.id,
     functionName: "canExecute",
     args: [proposalId],
   });
@@ -37,9 +40,11 @@ export function useProposalExecute(proposalId: string) {
     if (!canExecute) return;
 
     executeWrite({
-      chainId: PUB_CHAIN.id,
+      chainId: defaultChain.id,
       abi: TokenVotingAbi,
-      address: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+      address:
+        deployment.departments.departmentDaos.departmentFactory.departmentOwner
+          .tokenVoting,
       functionName: "execute",
       args: [proposalId],
     });

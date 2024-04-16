@@ -1,8 +1,7 @@
 import { FC, useState } from "react";
-import { Address, Hex } from "viem";
+import { Address, Hex, PublicClient, isAddress, zeroAddress } from "viem";
 import { AlertInline, InputText } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { isAddress } from "@/utils/evm";
 import { Action } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useAbi } from "@/hooks/useAbi";
@@ -10,9 +9,11 @@ import { FunctionSelector } from "./function-selector";
 import { AddressText } from "../text/address";
 
 interface FunctionCallFormProps {
+  publicClient: PublicClient;
   onAddAction: (action: Action) => any;
 }
 export const FunctionCallForm: FC<FunctionCallFormProps> = ({
+  publicClient,
   onAddAction,
 }) => {
   const [targetContract, setTargetContract] = useState<string>("");
@@ -21,11 +22,11 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({
     isLoading: loadingAbi,
     isProxy,
     implementation,
-  } = useAbi(targetContract as Address);
+  } = useAbi(targetContract as Address, publicClient);
 
   const actionEntered = (data: Hex, value: bigint) => {
     onAddAction({
-      to: targetContract,
+      to: isAddress(targetContract) ? targetContract : zeroAddress,
       value,
       data,
     });
