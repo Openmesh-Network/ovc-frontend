@@ -12,31 +12,24 @@ export default function Home() {
     <main className="w-screen max-w-full flex-col">
       <Card>
         <h1 className="text-2xl font-[700] text-neutral-800">
-          Welcome to Aragonette!
+          Welcome to the Openmesh Verified Contributor Dashboard!
         </h1>
         <p className="text-md text-neutral-400">
-          A beaufitul DAO experience in a simple template that you can
-          customize. Get started by connecting your wallet and selecting a
-          plugin from the menu.
+          Here you can participate in Openmesh Governance as Verified
+          Contributor. This includes all department DAOs. <br /> Do note that
+          you will only be able to governs DAOs you are a member of.
         </p>
         <div className="">
           <IllustrationHuman
             className="max-w-96 mx-auto mb-10"
-            body="BLOCKS"
-            expression="SMILE_WINK"
-            hairs="CURLY"
+            body="VOTING"
+            expression="SMILE"
+            hairs="COOL"
           />
           <div className="flex justify-center">
             <If condition={isConnected}>
               <Then>
-                <Button
-                  className="mb-2"
-                  variant="primary"
-                  href="https://devs.aragon.org/docs/osx/"
-                  target="_blank"
-                >
-                  Learn more about OSx
-                </Button>
+                <></>
               </Then>
               <Else>
                 <Button size="md" variant="primary" onClick={() => open()}>
