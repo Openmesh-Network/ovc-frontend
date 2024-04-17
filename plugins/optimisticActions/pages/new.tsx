@@ -1,9 +1,8 @@
 import { AlertCard, Button, InputText, TextAreaRichText } from "@aragon/ods";
 import React, { useEffect, useState } from "react";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { Address, encodeFunctionData, zeroHash } from "viem";
+import { Address, Hash, encodeFunctionData, zeroHash } from "viem";
 import { useAlerts } from "@/context/Alerts";
-import { FunctionCallForm } from "@/components/input/function-call-form";
 import { Action } from "@/utils/types";
 import { getPlainText } from "@/utils/html";
 import { useRouter } from "next/router";
@@ -16,19 +15,27 @@ import { defaultPublicClient } from "@/config/wagmi-config";
 import { DAOContract } from "@/contracts/DAO";
 import { OptimisticActionsContract } from "@/contracts/OptimisticActions";
 import { TrustlessManagementContract } from "@/trustless-indexer/contracts/TrustlessManagement";
+import {
+  ActionTemplate,
+  ActionTemplateForm,
+} from "@/components/input/action/preset-action-form";
 
 export default function Create({
   dao,
+  tag,
   creationTrustlessManagement,
   creationRole,
   executionTrustlessManagement,
   executionRole,
+  templates,
 }: {
   dao: Address;
+  tag: Hash;
   creationTrustlessManagement: Address;
   creationRole: bigint;
   executionTrustlessManagement: Address;
   executionRole: bigint;
+  templates: ActionTemplate[];
 }) {
   const { push } = useRouter();
   const [title, setTitle] = useState<string>("");
@@ -207,9 +214,11 @@ export default function Create({
             Select the type of proposal
           </span>
           <div className="mb-6">
-            <FunctionCallForm
-              publicClient={defaultPublicClient}
-              onAddAction={(action) => setActions(actions.concat([action]))}
+            <ActionTemplateForm
+              templates={templates}
+              dao={dao}
+              tag={tag}
+              onAddActions={(actions) => setActions(actions.concat(actions))}
             />
           </div>
         </div>

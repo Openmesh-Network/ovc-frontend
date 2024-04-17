@@ -1,6 +1,8 @@
 import {
   AlertCard,
   Button,
+  Icon,
+  IconType,
   InputText,
   TextAreaRichText,
   Toggle,
@@ -43,16 +45,27 @@ import {
 import { RouterContract } from "@/contracts/Router";
 import { CrossChainAccountContract } from "@/contracts/CrossChainAccount";
 import { DAOContract } from "@/contracts/DAO";
+import {
+  ActionTemplate,
+  ActionTemplateForm,
+} from "@/components/input/action/preset-action-form";
 
 enum Options {
   CrosschainExecution = "crosschainExecution",
   DirectDAO = "directDAO",
 }
 
+enum ActionType {
+  Template,
+  Custom,
+}
+
 export default function Create({
+  dao,
   plugin,
   tag,
 }: {
+  dao: Address;
   plugin: Address;
   tag: Hash;
 }) {
@@ -71,6 +84,7 @@ export default function Create({
   } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash: createTxHash });
+  const [actionType, setActionType] = useState<ActionType>(ActionType.Template);
 
   useEffect(() => {
     if (status === "idle" || status === "pending") return;
@@ -108,18 +122,11 @@ export default function Create({
   }, [status, createTxHash, isConfirming, isConfirmed]);
 
   useEffect(() => {
-    const department = departments.find((department) => department.tag === tag);
-    if (!department) {
-      setCallRevert(
-        `Department with tag ${tag} not found. Cannot simulate transaction.`
-      );
-      return;
-    }
     defaultPublicClient
       .simulateContract({
-        account: department.dao.tagVoting,
+        account: plugin,
         abi: DAOContract.abi,
-        address: department.dao.dao,
+        address: dao,
         functionName: "execute",
         args: [zeroHash, actions, BigInt(0)],
       })
@@ -222,29 +229,95 @@ export default function Create({
           <span className="font-normal block mb-2 text-lg text-neutral-900 ">
             Select the type of proposal
           </span>
-          <ToggleGroup
-            isMultiSelect={true}
-            value={options}
-            onChange={(newOptions) => setOptions(newOptions ?? [])}
-          >
-            <Toggle
-              label="Execute on Ethereum"
-              value={Options.CrosschainExecution}
-            />
-          </ToggleGroup>
+          <div className="mt-2 grid h-24 grid-cols-3 gap-5">
+            <div
+              onClick={() => setActionType(ActionType.Template)}
+              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                actionType === ActionType.Template
+                  ? "border-primary-300"
+                  : "border-neutral-100"
+              }`}
+            >
+              <Icon
+                className={
+                  "mt-2 !h-12 !w-10 p-2 " +
+                  (actionType === ActionType.Template
+                    ? "text-primary-400"
+                    : "text-neutral-400")
+                }
+                icon={IconType.INFO}
+                size="lg"
+              />
+              <span className="text-center text-sm text-neutral-400">
+                Template
+              </span>
+            </div>
+            <div
+              onClick={() => setActionType(ActionType.Custom)}
+              className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                actionType === ActionType.Custom
+                  ? "border-primary-300"
+                  : "border-neutral-100"
+              }`}
+            >
+              <Icon
+                className={
+                  "mt-2 !h-12 !w-10 p-2 " +
+                  (actionType === ActionType.Custom
+                    ? "text-primary-400"
+                    : "text-neutral-400")
+                }
+                icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
+                size="lg"
+              />
+              <span className="text-center text-sm text-neutral-400">
+                Custom action
+              </span>
+            </div>
+          </div>
           <div className="mb-6">
-            <FunctionCallForm
-              publicClient={
-                options.includes(Options.CrosschainExecution)
-                  ? crosschainAccountPublicClient
-                  : defaultPublicClient
-              }
-              onAddAction={async (action) =>
-                setActions(
-                  actions.concat([await applyOptions(action, options, tag)])
-                )
-              }
-            />
+            <ToggleGroup
+              isMultiSelect={true}
+              value={options}
+              onChange={(newOptions) => setOptions(newOptions ?? [])}
+            >
+              <Toggle
+                label="Execute on Ethereum"
+                value={Options.CrosschainExecution}
+              />
+            </ToggleGroup>
+            {actionType === ActionType.Template && (
+              <ActionTemplateForm
+                dao={dao}
+                tag={tag}
+                templates={[ActionTemplate.AddDepartmentMember]}
+                onAddActions={async (actions) =>
+                  setActions(
+                    actions.concat(
+                      await Promise.all(
+                        actions.map((action) =>
+                          applyOptions(action, options, tag)
+                        )
+                      )
+                    )
+                  )
+                }
+              />
+            )}
+            {actionType === ActionType.Custom && (
+              <FunctionCallForm
+                publicClient={
+                  options.includes(Options.CrosschainExecution)
+                    ? crosschainAccountPublicClient
+                    : defaultPublicClient
+                }
+                onAddAction={async (action) =>
+                  setActions(
+                    actions.concat([await applyOptions(action, options, tag)])
+                  )
+                }
+              />
+            )}
           </div>
         </div>
 

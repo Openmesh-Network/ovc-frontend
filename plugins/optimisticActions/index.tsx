@@ -5,11 +5,12 @@ import ProposalDetail from "./pages/proposal";
 import { useUrl } from "@/hooks/useUrl";
 import { departments } from "@/ovc-indexer/contracts/departments";
 import Daos from "./pages/dao-list";
-import { Address } from "viem";
+import { Address, zeroHash } from "viem";
 import { VerifiedContributorTagTrustlessManagementContract } from "@/contracts/VerifiedContributorTagTrustlessManagement";
 import { deployment } from "@/ovc-indexer/contracts/deployment";
 import { AddressTrustlessManagementContract } from "@/contracts/AddressTrustlessManagement";
 import { OptimisticActionsContract } from "@/contracts/OptimisticActions";
+import { ActionTemplate } from "@/components/input/action/preset-action-form";
 
 export const daos = departments
   .map((d) => {
@@ -17,9 +18,11 @@ export const daos = departments
       name: d.name as string,
       description: d.description as string,
       dao: d.smart_account as Address,
+      tag: d.tag,
       trustlessManagement:
         VerifiedContributorTagTrustlessManagementContract.address as Address,
-      role: BigInt(d.tag) as bigint,
+      role: BigInt(d.tag),
+      templates: [ActionTemplate.DepartmentMemberPayment],
     };
   })
   .concat([
@@ -28,9 +31,11 @@ export const daos = departments
       description: "All Verified Contributors",
       dao: deployment.departments.departmentDaos.departmentFactory
         .departmentOwner.dao,
+      tag: zeroHash,
       trustlessManagement:
         deployment.departments.verifiedContributorCountTrustlessManagement,
       role: BigInt(1),
+      templates: [ActionTemplate.MintOVC],
     },
   ]);
 
@@ -70,12 +75,14 @@ export default function PluginPage() {
     return (
       <ProposalCreate
         dao={dao.dao}
+        tag={dao.tag}
         creationTrustlessManagement={dao.trustlessManagement}
         creationRole={dao.role}
         executionTrustlessManagement={
           AddressTrustlessManagementContract.address
         }
         executionRole={BigInt(OptimisticActionsContract.address)}
+        templates={dao.templates}
       />
     );
   else if (page.startsWith("proposals/")) {

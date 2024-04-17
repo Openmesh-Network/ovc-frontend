@@ -34,7 +34,11 @@ export default function PluginPage() {
     );
   else if (page === "new")
     return (
-      <ProposalCreate plugin={department.dao.tagVoting} tag={department.tag} />
+      <ProposalCreate
+        dao={department.dao.dao}
+        plugin={department.dao.tagVoting}
+        tag={department.tag}
+      />
     );
   else if (page.startsWith("proposals/")) {
     const id = page.replace("proposals/", "");

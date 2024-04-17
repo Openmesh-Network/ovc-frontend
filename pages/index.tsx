@@ -17,7 +17,7 @@ export default function Home() {
         <p className="text-md text-neutral-400">
           Here you can participate in Openmesh Governance as Verified
           Contributor. This includes all department DAOs. <br /> Do note that
-          you will only be able to governs DAOs you are a member of.
+          you will only be able to govern DAOs you are a member of.
         </p>
         <div className="">
           <IllustrationHuman
