@@ -14,6 +14,8 @@ import { TasksContract } from "@/ovc-indexer/openrd-indexer/contracts/Tasks";
 import { deployment } from "@/ovc-indexer/contracts/deployment";
 import axios from "axios";
 import { AddToIpfsRequest, AddToIpfsResponse } from "@/pages/api/addToIpfs";
+import { UserReturn } from "@/ovc-indexer/api/return-types";
+import { reviver } from "@/ovc-indexer/openrd-indexer/utils/json";
 
 interface InputAddDepartmentMemberProps {
   dao: Address;
@@ -40,7 +42,13 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
       throw new Error(`Invalid value for newMember: ${newMember}`);
     }
     const newMemberAddress = newMember;
-    const newMemberNfts = [BigInt(0)];
+    const newMemberNfts = await axios
+      .get(`/indexer/user/${newMemberAddress}`)
+      .then(
+        (response) =>
+          JSON.parse(JSON.stringify(response.data), reviver) as UserReturn
+      )
+      .then((response) => response.verifiedContributors);
     const newMemberNftId = newMemberNfts.at(0);
     if (newMemberNftId === undefined) {
       throw new Error(
@@ -51,7 +59,7 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
     const taskInfo = {
       title: `Department Membership of ${newMemberAddress}`,
       tags: [{ tag: "Department Task" }],
-      description: `<span>Member is responsible for:</span><br />${responsibility}`,
+      description: `<p>Member is responsible for:</p>${responsibility}`,
     };
     const request: AddToIpfsRequest = {
       json: JSON.stringify(taskInfo),
