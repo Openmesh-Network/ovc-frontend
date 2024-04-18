@@ -137,6 +137,12 @@ export default function Create({
       });
   }, [actions]);
 
+  useEffect(() => {
+    if (actionType === ActionType.Template && options.length !== 0) {
+      setOptions([]);
+    }
+  }, [actionType]);
+
   const submitProposal = async () => {
     // Check metadata
     if (!title.trim())
@@ -276,16 +282,6 @@ export default function Create({
             </div>
           </div>
           <div className="mb-6">
-            <ToggleGroup
-              isMultiSelect={true}
-              value={options}
-              onChange={(newOptions) => setOptions(newOptions ?? [])}
-            >
-              <Toggle
-                label="Execute on Ethereum"
-                value={Options.CrosschainExecution}
-              />
-            </ToggleGroup>
             {actionType === ActionType.Template && (
               <ActionTemplateForm
                 dao={dao}
@@ -305,18 +301,30 @@ export default function Create({
               />
             )}
             {actionType === ActionType.Custom && (
-              <FunctionCallForm
-                publicClient={
-                  options.includes(Options.CrosschainExecution)
-                    ? crosschainAccountPublicClient
-                    : defaultPublicClient
-                }
-                onAddAction={async (action) =>
-                  setActions(
-                    actions.concat([await applyOptions(action, options, tag)])
-                  )
-                }
-              />
+              <div>
+                <ToggleGroup
+                  isMultiSelect={true}
+                  value={options}
+                  onChange={(newOptions) => setOptions(newOptions ?? [])}
+                >
+                  <Toggle
+                    label="Execute on Ethereum"
+                    value={Options.CrosschainExecution}
+                  />
+                </ToggleGroup>
+                <FunctionCallForm
+                  publicClient={
+                    options.includes(Options.CrosschainExecution)
+                      ? crosschainAccountPublicClient
+                      : defaultPublicClient
+                  }
+                  onAddAction={async (action) =>
+                    setActions(
+                      actions.concat([await applyOptions(action, options, tag)])
+                    )
+                  }
+                />
+              </div>
             )}
           </div>
         </div>

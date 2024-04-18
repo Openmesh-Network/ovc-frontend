@@ -15,6 +15,9 @@ import {
 } from "@/trustless-indexer/types/trustless-actions";
 import { defaultChain } from "@/config/wagmi-config";
 import axios from "axios";
+import { If } from "@/components/if";
+import RejectionModal from "../components/vote/rejection-modal";
+import { AddToIpfsRequest, AddToIpfsResponse } from "@/pages/api/addToIpfs";
 
 export default function ProposalDetail({
   dao,
@@ -27,6 +30,7 @@ export default function ProposalDetail({
   role: bigint;
   id: number;
 }) {
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
   const skipRender = useSkipFirstRender();
   const [baseAction, setBaseAction] = useState<
     IndexedActionRequest | undefined
@@ -86,7 +90,7 @@ export default function ProposalDetail({
           transactionConfirming={showTransactionConfirming}
           canVote={!!userCanVote}
           canExecute={canExecute}
-          onReject={() => voteProposal("https://plopmenz.com")}
+          onReject={() => setShowRejectionModal(true)}
           onExecute={() => executeProposal()}
         />
       </div>
@@ -100,6 +104,27 @@ export default function ProposalDetail({
 
         <ProposalDescription {...baseAction} />
       </div>
+
+      <If condition={showRejectionModal}>
+        <RejectionModal
+          onDismissModal={() => setShowRejectionModal(false)}
+          onReject={(reason) => {
+            setShowRejectionModal(false);
+            const request: AddToIpfsRequest = {
+              json: JSON.stringify({
+                reason: reason,
+              }),
+            };
+            axios
+              .post("/api/addToIpfs", request)
+              .then((response) => response.data as AddToIpfsResponse)
+              .then((response) => response.cid)
+              .then((cid) => `ipfs://${cid}`)
+              .then((metadata) => voteProposal(metadata))
+              .catch(console.error);
+          }}
+        />
+      </If>
     </section>
   );
 }

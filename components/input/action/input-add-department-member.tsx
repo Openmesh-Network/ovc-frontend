@@ -1,6 +1,12 @@
 import { FC, useState } from "react";
-import { Address, Hash, encodeFunctionData, isAddress } from "viem";
-import { Button, InputText, TextAreaRichText } from "@aragon/ods";
+import {
+  Address,
+  Hash,
+  encodeFunctionData,
+  isAddress,
+  zeroAddress,
+} from "viem";
+import { Button, Dropdown, InputText, TextAreaRichText } from "@aragon/ods";
 import { Action } from "@/utils/types";
 import { parseBigInt } from "@/utils/bigint";
 import { VerifiedContributorTagManagerContract } from "@/ovc-indexer/contracts/VerifiedContributorTagManager";
@@ -23,6 +29,7 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
   const [responsibility, setResponsibility] = useState<string>("");
   const [salary, setSalary] = useState<
     {
+      tokenName: string;
       tokenContract: string;
       amount: string;
     }[]
@@ -137,6 +144,80 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
           value={responsibility}
           onChange={(value) => setResponsibility(value || "")}
         />
+        <div>
+          {salary.map((salaryItem, i) => (
+            <div key={i}>
+              <span>Salary item #{i + 1}</span>
+              <Dropdown.Container label={salaryItem.tokenName}>
+                <Dropdown.Item
+                  onSelect={() => {
+                    setSalary(
+                      salary.map((item, index) => {
+                        if (index === i) {
+                          return {
+                            ...item,
+                            tokenName: "USDT",
+                            tokenContract: "0x0",
+                          };
+                        }
+
+                        return item;
+                      })
+                    );
+                  }}
+                >
+                  USDT
+                </Dropdown.Item>
+              </Dropdown.Container>
+              <InputText
+                label="Amount"
+                placeholder="0"
+                variant={
+                  parseBigInt(salaryItem.amount) !== undefined
+                    ? "default"
+                    : "critical"
+                }
+                value={salaryItem.amount}
+                onChange={(e) => {
+                  setSalary(
+                    salary.map((item, index) => {
+                      if (index === i) {
+                        return {
+                          ...item,
+                          amount: e.target.value || "",
+                        };
+                      }
+
+                      return item;
+                    })
+                  );
+                }}
+              />
+              <Button
+                onClick={() =>
+                  setSalary(salary.filter((_, index) => index !== i))
+                }
+              >
+                X
+              </Button>
+            </div>
+          ))}
+          <Button
+            onClick={() =>
+              setSalary(
+                salary.concat([
+                  {
+                    tokenName: "Select token",
+                    tokenContract: zeroAddress,
+                    amount: "0",
+                  },
+                ])
+              )
+            }
+          >
+            Add salary token
+          </Button>
+        </div>
       </div>
       <Button onClick={() => actionEntered().catch(console.error)}>
         Add action

@@ -1,18 +1,17 @@
-import { Button } from "@aragon/ods";
+import { Button, TextAreaRichText } from "@aragon/ods";
+import { useState } from "react";
 
-const ABSTAIN_VALUE = 1;
-const VOTE_YES_VALUE = 2;
-const VOTE_NO_VALUE = 3;
-
-interface VotingModalProps {
+interface RejectionModalProps {
   onDismissModal: () => void;
-  selectedVote: (option: number) => void;
+  onReject: (reason: string) => void;
 }
 
-const VotingModal: React.FC<VotingModalProps> = ({
+const RejectionModal: React.FC<RejectionModalProps> = ({
   onDismissModal,
-  selectedVote,
+  onReject,
 }) => {
+  const [reason, setReason] = useState("");
+
   return (
     <>
       <div
@@ -28,7 +27,7 @@ const VotingModal: React.FC<VotingModalProps> = ({
             {/*header*/}
             <div className="flex items-start justify-between p-3 rounded-t">
               <h3 className="text-lg pr-4 font-semibold text-neutral-700">
-                Vote submission
+                Reject
               </h3>
               <button
                 className="bg-transparent hover:bg-neutral-200 active:bg-neutral-200 text-neutral-800 opacity-1 float-right text-3xl rounded-lg"
@@ -42,34 +41,21 @@ const VotingModal: React.FC<VotingModalProps> = ({
             {/*footer*/}
             <div className="p-3 w-full rounded-b-lg bg-neutral-50">
               <p className="text-sm">
-                You are about to vote for the current proposal. This will create
-                a transaction that you will need to sign.
+                You are about to reject this action. This will create a
+                transaction that you will need to sign.
               </p>
-              <p className="text-sm mt-3">Select your vote option:</p>
+              <p className="text-sm mt-3">Provide your reason for rejection:</p>
+              <TextAreaRichText
+                value={reason}
+                onChange={(value) => setReason(value)}
+              />
               <Button
                 className="w-full h-5 my-3 items-center"
                 size="md"
                 variant="tertiary"
-                onClick={() => selectedVote(VOTE_YES_VALUE)}
+                onClick={() => onReject(reason)}
               >
-                <span className="text-success-700">Vote yes</span>
-              </Button>
-              <Button
-                className="w-full h-5 my-3 items-center"
-                size="md"
-                variant="tertiary"
-                onClick={() => selectedVote(VOTE_NO_VALUE)}
-              >
-                <span className="text-critical-700">Vote no</span>
-              </Button>
-
-              <Button
-                className="w-full h-5 my-3 items-center"
-                size="md"
-                variant="tertiary"
-                onClick={() => selectedVote(ABSTAIN_VALUE)}
-              >
-                Abstain
+                Reject
               </Button>
             </div>
           </div>
@@ -80,4 +66,4 @@ const VotingModal: React.FC<VotingModalProps> = ({
   );
 };
 
-export default VotingModal;
+export default RejectionModal;
