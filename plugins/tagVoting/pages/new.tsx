@@ -406,73 +406,6 @@ async function applyOptions(
       ],
       [action.to, action.value, action.data]
     );
-    // const response = await crosschainAccountPublicClient.transport.request({
-    //   method: "eth_call",
-    //   params: [
-    //     {
-    //       from: CCIPDeployments[crosschainAccountChain.id].router,
-    //       data: encodeFunctionData({
-    //         abi: CrossChainAccountContract.abi,
-    //         functionName: "ccipReceive",
-    //         args: [
-    //           {
-    //             messageId: zeroHash,
-    //             sourceChainSelector:
-    //               CCIPDeployments[defaultChain.id].chainSelector,
-    //             sender: department.smart_account,
-    //             data: message,
-    //             destTokenAmounts: [],
-    //           },
-    //         ],
-    //       }),
-    //       to: department.crosschain_account,
-    //     },
-    //     "latest",
-    //     {
-    //       [CCIPDeployments[crosschainAccountChain.id].router]: {
-    //         balance: toHex(parseEther("1")),
-    //       },
-    //     },
-    //   ],
-    // });
-    const bytecode = await crosschainAccountPublicClient.getBytecode({
-      address: department.crosschain_account,
-    });
-    if (!bytecode) {
-      throw new Error(
-        `No bytecode for ${department.crosschain_account} found.`
-      );
-    }
-    const fakeRouter = "0xaF7E68bCb2Fc7295492A00177f14F59B92814e70";
-    const { request } = await crosschainAccountPublicClient.simulateContract({
-      // account: CCIPDeployments[crosschainAccountChain.id].router,
-      account: fakeRouter,
-      address: department.crosschain_account,
-      abi: CrossChainAccountContract.abi,
-      functionName: "ccipReceive",
-      args: [
-        {
-          messageId: zeroHash,
-          sourceChainSelector: CCIPDeployments[defaultChain.id].chainSelector,
-          sender: department.smart_account,
-          data: message,
-          destTokenAmounts: [],
-        },
-      ],
-      stateOverride: [
-        {
-          address: department.crosschain_account,
-          // Router is stored as immutable variable inside of the contract code
-          code: bytecode.replace(
-            CCIPDeployments[crosschainAccountChain.id].router
-              .replace("0x", "")
-              .toLowerCase(),
-            fakeRouter.replace("0x", "")
-          ) as Hex,
-        },
-      ],
-    });
-    console.log(request);
     const gas = await crosschainAccountPublicClient
       .estimateContractGas({
         account: CCIPDeployments[crosschainAccountChain.id].router,
@@ -483,7 +416,10 @@ async function applyOptions(
           {
             messageId: zeroHash,
             sourceChainSelector: CCIPDeployments[defaultChain.id].chainSelector,
-            sender: department.smart_account,
+            sender: encodeAbiParameters(
+              [{ type: "address" }],
+              [department.smart_account]
+            ),
             data: message,
             destTokenAmounts: [],
           },
@@ -492,6 +428,7 @@ async function applyOptions(
       .catch((error) => {
         throw new Error(`CCIP gas estimation error: ${error}`);
       });
+
     action = {
       to: CCIPDeployments[defaultChain.id].router,
       value: BigInt(0),
