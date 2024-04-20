@@ -16,9 +16,6 @@ import {
   Hex,
   encodeAbiParameters,
   encodeFunctionData,
-  keccak256,
-  parseAbiItem,
-  toBytes,
   toHex,
   zeroHash,
 } from "viem";
@@ -429,6 +426,7 @@ async function applyOptions(
         throw new Error(`CCIP gas estimation error: ${error}`);
       });
 
+    const extraArgsVersion = "0x97a657c9"; // bytes4(keccak256("CCIP EVMExtraArgsV1"))
     action = {
       to: CCIPDeployments[defaultChain.id].router,
       value: BigInt(0),
@@ -445,19 +443,11 @@ async function applyOptions(
             data: message,
             tokenAmounts: [],
             feeToken: CCIPDeployments[defaultChain.id].feeTokens.link,
-            extraArgs: encodeAbiParameters(
-              [
-                { type: "bytes4", name: "selector" },
-                { type: "uint256", name: "gasLimit" },
-              ],
-              [
-                keccak256(toBytes("CCIP EVMExtraArgsV1")).substring(
-                  0,
-                  10
-                ) as Hex,
-                BigInt(gas),
-              ]
-            ),
+            extraArgs: (extraArgsVersion +
+              encodeAbiParameters(
+                [{ type: "uint256", name: "gasLimit" }],
+                [gas]
+              ).replace("0x", "")) as Hex,
           },
         ],
       }),
