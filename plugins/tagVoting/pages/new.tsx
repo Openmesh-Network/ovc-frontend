@@ -438,7 +438,10 @@ async function applyOptions(
         args: [
           CCIPDeployments[crosschainAccountChain.id].chainSelector,
           {
-            receiver: department.crosschain_account,
+            receiver: encodeAbiParameters(
+              [{ type: "address" }],
+              [department.crosschain_account]
+            ),
             data: message,
             tokenAmounts: [],
             feeToken: CCIPDeployments[defaultChain.id].feeTokens.link,
