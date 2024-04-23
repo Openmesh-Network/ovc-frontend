@@ -164,8 +164,9 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
                         if (index === i) {
                           return {
                             ...item,
-                            tokenName: "USDT",
-                            tokenContract: "0x0",
+                            tokenName: "FREEthereum",
+                            tokenContract:
+                              "0xFc3e4F94a111252a763D019Da81aD3855A27EF59",
                           };
                         }
 
