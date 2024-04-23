@@ -69,7 +69,7 @@ export const InputDepartmentMemberPayment: FC<
           equal: dao.toLowerCase(),
           convertValueToLowercase: true,
         },
-        taskState: {
+        state: {
           equal: TaskState.Taken,
         },
         executorApplication: {
@@ -150,7 +150,7 @@ export const InputDepartmentMemberPayment: FC<
         <Dropdown.Container label="Department Task">
           {departmentTasks.map((departmentTask, i) => (
             <Dropdown.Item key={i} onSelect={() => setTaskId(departmentTask)}>
-              departmentTask.toString()
+              Task #{departmentTask.toString()}
             </Dropdown.Item>
           ))}
         </Dropdown.Container>

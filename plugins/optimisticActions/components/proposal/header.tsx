@@ -75,16 +75,6 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 <PleaseWaitSpinner fullMessage="Confirming..." />
               </div>
             </Then>
-            <ElseIf condition={canVote}>
-              <Button
-                className="flex h-5 items-center"
-                size="lg"
-                variant="primary"
-                onClick={() => onReject()}
-              >
-                Reject
-              </Button>
-            </ElseIf>
             <ElseIf condition={canExecute}>
               <Button
                 className="flex h-5 items-center"
@@ -93,6 +83,16 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 onClick={() => onExecute()}
               >
                 Execute
+              </Button>
+            </ElseIf>
+            <ElseIf condition={canVote}>
+              <Button
+                className="flex h-5 items-center"
+                size="lg"
+                variant="primary"
+                onClick={() => onReject()}
+              >
+                Reject
               </Button>
             </ElseIf>
           </If>

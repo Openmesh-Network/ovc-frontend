@@ -61,10 +61,14 @@ export default function Create({
   dao,
   plugin,
   tag,
+  smartAccount,
+  crosschainAccount,
 }: {
   dao: Address;
   plugin: Address;
   tag: Hash;
+  smartAccount: Address;
+  crosschainAccount: Address;
 }) {
   const { push } = useRouter();
   const [title, setTitle] = useState<string>("");
@@ -281,14 +285,21 @@ export default function Create({
           <div className="mb-6">
             {actionType === ActionType.Template && (
               <ActionTemplateForm
-                dao={dao}
+                dao={smartAccount}
                 tag={tag}
                 templates={[ActionTemplate.AddDepartmentMember]}
                 onAddActions={async (a) =>
                   setActions(
                     actions.concat(
                       await Promise.all(
-                        a.map((action) => applyOptions(action, options, tag))
+                        a.map((action) =>
+                          applyOptions(
+                            action,
+                            options,
+                            smartAccount,
+                            crosschainAccount
+                          )
+                        )
                       )
                     )
                   )
@@ -315,7 +326,14 @@ export default function Create({
                   }
                   onAddAction={async (action) =>
                     setActions(
-                      actions.concat([await applyOptions(action, options, tag)])
+                      actions.concat([
+                        await applyOptions(
+                          action,
+                          options,
+                          smartAccount,
+                          crosschainAccount
+                        ),
+                      ])
                     )
                   }
                 />
@@ -375,17 +393,12 @@ export default function Create({
 async function applyOptions(
   action: Action,
   options: string[],
-  tag: Hash
+  smartAccount: Address,
+  crosschainAccount: Address
 ): Promise<Action> {
-  const department = departments.find((department) => department.tag === tag);
-  if (!department) {
-    throw new Error(
-      "Department not found, but required for wrapping the proposal actions."
-    );
-  }
   if (options.includes(Options.CrosschainExecution)) {
     action = {
-      to: department.smart_account,
+      to: smartAccount,
       value: BigInt(0),
       data: encodeFunctionData({
         abi: SmartAccountContract.abi,
@@ -404,17 +417,14 @@ async function applyOptions(
     const gas = await crosschainAccountPublicClient
       .estimateContractGas({
         account: CCIPDeployments[crosschainAccountChain.id].router,
-        address: department.crosschain_account,
+        address: crosschainAccount,
         abi: CrossChainAccountContract.abi,
         functionName: "ccipReceive",
         args: [
           {
             messageId: zeroHash,
             sourceChainSelector: CCIPDeployments[defaultChain.id].chainSelector,
-            sender: encodeAbiParameters(
-              [{ type: "address" }],
-              [department.smart_account]
-            ),
+            sender: encodeAbiParameters([{ type: "address" }], [smartAccount]),
             data: message,
             destTokenAmounts: [],
           },
@@ -436,7 +446,7 @@ async function applyOptions(
           {
             receiver: encodeAbiParameters(
               [{ type: "address" }],
-              [department.crosschain_account]
+              [crosschainAccount]
             ),
             data: message,
             tokenAmounts: [],
@@ -454,7 +464,7 @@ async function applyOptions(
 
   if (!options.includes(Options.DirectDAO)) {
     action = {
-      to: department.smart_account,
+      to: smartAccount,
       value: BigInt(0),
       data: encodeFunctionData({
         abi: SmartAccountContract.abi,

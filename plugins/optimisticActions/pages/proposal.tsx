@@ -88,8 +88,8 @@ export default function ProposalDetail({
           baseAction={baseAction}
           executableFrom={optimisticAction.executableFrom}
           transactionConfirming={showTransactionConfirming}
-          canVote={!!userCanVote}
-          canExecute={canExecute}
+          canVote={!!userCanVote && !baseAction.executed}
+          canExecute={canExecute && !baseAction.executed}
           onReject={() => setShowRejectionModal(true)}
           onExecute={() => executeProposal()}
         />

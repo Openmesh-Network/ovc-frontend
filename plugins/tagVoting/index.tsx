@@ -38,6 +38,8 @@ export default function PluginPage() {
         dao={department.dao.dao}
         plugin={department.dao.tagVoting}
         tag={department.tag}
+        smartAccount={department.smart_account}
+        crosschainAccount={department.crosschain_account}
       />
     );
   else if (page.startsWith("proposals/")) {
