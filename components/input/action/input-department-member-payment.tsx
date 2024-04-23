@@ -1,11 +1,11 @@
 import { FC, useEffect, useState } from "react";
-import { Address, encodeFunctionData } from "viem";
+import { Address, encodeFunctionData, erc20Abi, parseUnits } from "viem";
 import { Button, Dropdown, InputText } from "@aragon/ods";
 import { Action } from "@/utils/types";
 import { parseBigInt } from "@/utils/bigint";
 import { TasksContract } from "@/ovc-indexer/openrd-indexer/contracts/Tasks";
 import { Task, TaskState } from "@/ovc-indexer/openrd-indexer/types/tasks";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContracts } from "wagmi";
 import axios from "axios";
 import { replacer, reviver } from "@/ovc-indexer/openrd-indexer/utils/json";
 import { ObjectFilter } from "@/ovc-indexer/openrd-indexer/api/filter";
@@ -27,10 +27,13 @@ export const InputDepartmentMemberPayment: FC<
       throw new Error(`Invalid value for taskId: ${taskId}`);
     }
 
+    const tokenDecimals = decimals as number[];
     const partialNativeReward: bigint[] = [];
-    const partialReward = amounts.map((amount) => {
-      const amountBigint = parseBigInt(amount);
-      if (!amountBigint) {
+    const partialReward = amounts.map((amount, i) => {
+      let amountBigint: bigint;
+      try {
+        amountBigint = parseUnits(amount, tokenDecimals[i]);
+      } catch {
         throw new Error(`Invalid amount ${amount}`);
       }
 
@@ -142,7 +145,18 @@ export const InputDepartmentMemberPayment: FC<
     }
 
     setAmounts(task.budget.map((_) => "0")); // Initialize a 0 amount for each token
-  }, [task]);
+  }, [task?.budget]);
+
+  const { data: decimals } = useReadContracts({
+    contracts: (task?.budget ?? []).map((budgetItem) => {
+      return {
+        abi: erc20Abi,
+        address: budgetItem.tokenContract,
+        functionName: "decimals",
+      };
+    }),
+    allowFailure: false,
+  });
 
   return (
     <div className="my-6">
