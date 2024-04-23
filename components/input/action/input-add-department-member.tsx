@@ -4,6 +4,7 @@ import {
   Hash,
   encodeFunctionData,
   isAddress,
+  parseUnits,
   zeroAddress,
 } from "viem";
 import { Button, Dropdown, InputText, TextAreaRichText } from "@aragon/ods";
@@ -34,6 +35,7 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
       tokenName: string;
       tokenContract: string;
       amount: string;
+      decimals: number;
     }[]
   >([]);
 
@@ -80,8 +82,11 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
       if (!isAddress(salaryItem.tokenContract)) {
         throw new Error(`Invalid salary token ${salaryItem.tokenContract}`);
       }
-      const salaryAmount = parseBigInt(salaryItem.amount);
-      if (!salaryAmount) {
+
+      let salaryAmount: bigint;
+      try {
+        salaryAmount = parseUnits(salaryItem.amount, salaryItem.decimals);
+      } catch {
         throw new Error(`Invalid salary amount ${salaryItem.amount}`);
       }
 
@@ -167,6 +172,7 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
                             tokenName: "FREEthereum",
                             tokenContract:
                               "0xFc3e4F94a111252a763D019Da81aD3855A27EF59",
+                            decimals: 18,
                           };
                         }
 
@@ -175,7 +181,7 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
                     );
                   }}
                 >
-                  USDT
+                  FREEthereum
                 </Dropdown.Item>
               </Dropdown.Container>
               <InputText
@@ -219,6 +225,7 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
                     tokenName: "Select token",
                     tokenContract: zeroAddress,
                     amount: "0",
+                    decimals: 18,
                   },
                 ])
               )
