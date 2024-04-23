@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from "react";
 import { Address, encodeFunctionData, erc20Abi, parseUnits } from "viem";
 import { Button, Dropdown, InputText } from "@aragon/ods";
 import { Action } from "@/utils/types";
-import { parseBigInt } from "@/utils/bigint";
 import { TasksContract } from "@/ovc-indexer/openrd-indexer/contracts/Tasks";
 import { Task, TaskState } from "@/ovc-indexer/openrd-indexer/types/tasks";
 import { useAccount, useReadContracts } from "wagmi";
@@ -27,9 +26,12 @@ export const InputDepartmentMemberPayment: FC<
       throw new Error(`Invalid value for taskId: ${taskId}`);
     }
 
-    const tokenDecimals = decimals as number[];
     const partialNativeReward: bigint[] = [];
     const partialReward = amounts.map((amount, i) => {
+      if (tokenDecimals.length <= i) {
+        throw new Error(`Token decimals of token ${i} not loaded (yet).`);
+      }
+
       let amountBigint: bigint;
       try {
         amountBigint = parseUnits(amount, tokenDecimals[i]);
@@ -157,6 +159,19 @@ export const InputDepartmentMemberPayment: FC<
     }),
     allowFailure: false,
   });
+  const tokenDecimals = decimals as number[];
+
+  const { data: names } = useReadContracts({
+    contracts: (task?.budget ?? []).map((budgetItem) => {
+      return {
+        abi: erc20Abi,
+        address: budgetItem.tokenContract,
+        functionName: "name",
+      };
+    }),
+    allowFailure: false,
+  });
+  const tokenNames = names as string[];
 
   return (
     <div className="my-6">
@@ -172,7 +187,7 @@ export const InputDepartmentMemberPayment: FC<
           task.budget.map((budgetItem, i) => (
             <InputText
               key={i}
-              label={`Amount of ${budgetItem.tokenContract}`}
+              label={`Amount of ${names?.at(i) ?? budgetItem.tokenContract}`}
               value={amounts.at(i) ?? "0"}
               onChange={(e) => {
                 amounts[i] = e.target.value;
