@@ -188,9 +188,7 @@ export const InputAddDepartmentMember: FC<InputAddDepartmentMemberProps> = ({
                 label="Amount"
                 placeholder="0"
                 variant={
-                  parseBigInt(salaryItem.amount) !== undefined
-                    ? "default"
-                    : "critical"
+                  !isNaN(parseFloat(salaryItem.amount)) ? "default" : "critical"
                 }
                 value={salaryItem.amount}
                 onChange={(e) => {

@@ -187,10 +187,12 @@ export const InputDepartmentMemberPayment: FC<
           task.budget.map((budgetItem, i) => (
             <InputText
               key={i}
-              label={`Amount of ${names?.at(i) ?? budgetItem.tokenContract}`}
+              label={`Amount of ${tokenNames?.at(i) ?? budgetItem.tokenContract}`}
               value={amounts.at(i) ?? "0"}
               onChange={(e) => {
-                amounts[i] = e.target.value;
+                const newAmounts = [...amounts];
+                newAmounts[i] = e.target.value;
+                setAmounts(newAmounts);
               }}
             />
           ))}
