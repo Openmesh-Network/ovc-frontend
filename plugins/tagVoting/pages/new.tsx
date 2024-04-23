@@ -284,13 +284,11 @@ export default function Create({
                 dao={dao}
                 tag={tag}
                 templates={[ActionTemplate.AddDepartmentMember]}
-                onAddActions={async (actions) =>
+                onAddActions={async (a) =>
                   setActions(
                     actions.concat(
                       await Promise.all(
-                        actions.map((action) =>
-                          applyOptions(action, options, tag)
-                        )
+                        a.map((action) => applyOptions(action, options, tag))
                       )
                     )
                   )

@@ -218,7 +218,7 @@ export default function Create({
               templates={templates}
               dao={dao}
               tag={tag}
-              onAddActions={(actions) => setActions(actions.concat(actions))}
+              onAddActions={(a) => setActions(actions.concat(a))}
             />
           </div>
         </div>
