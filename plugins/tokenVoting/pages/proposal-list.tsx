@@ -43,7 +43,7 @@ export default function Proposals() {
     functionName: "proposalCount",
   });
 
-  const { writeContract: delegate } = useWriteContract();
+  const { writeContractAsync: delegate } = useWriteContract();
   const [showDelegateModal, SetShowDelegateModal] = useState(false);
 
   useEffect(() => {
@@ -159,7 +159,7 @@ export default function Proposals() {
               address: VerifiedContributorContract.address,
               functionName: "delegate",
               args: [to],
-            });
+            }).catch(console.error);
             SetShowDelegateModal(false);
           }}
         />

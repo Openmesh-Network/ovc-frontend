@@ -60,7 +60,7 @@ const DelegateModal: React.FC<DelegateModalProps> = ({
                 variant="tertiary"
                 onClick={() => {
                   if (!isAddress(to)) {
-                    console.error("Delegetee is not a valid address");
+                    console.error("Delegatee is not a valid address");
                     return;
                   }
 
