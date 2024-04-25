@@ -46,12 +46,12 @@ export default function ProposalDetail({
     };
 
     getBaseAction().catch(console.error);
-  });
+  }, [dao, proposalId]);
 
   const { data: optimisticAction } = useReadContract({
     abi: OptimisticActionsContract.abi,
     address: OptimisticActionsContract.address,
-    functionName: "getOptimsticAction",
+    functionName: "getOptimisticAction",
     args: [dao, proposalId],
   });
 

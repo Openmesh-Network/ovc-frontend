@@ -78,7 +78,7 @@ export const OptimisticActionsContract = {
     },
     {
       type: "function",
-      name: "getOptimsticAction",
+      name: "getOptimisticAction",
       inputs: [
         { name: "_dao", type: "address", internalType: "contract IDAO" },
         { name: "_id", type: "uint32", internalType: "uint32" },
