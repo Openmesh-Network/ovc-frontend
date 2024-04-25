@@ -1,4 +1,9 @@
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import {
+  useAccount,
+  useBlockNumber,
+  useReadContract,
+  useWriteContract,
+} from "wagmi";
 import { ReactNode, useEffect, useState } from "react";
 import ProposalCard from "@/plugins/tokenVoting/components/proposal";
 import { TokenVotingAbi } from "@/plugins/tokenVoting/artifacts/TokenVoting.sol";
@@ -9,11 +14,12 @@ import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useSkipFirstRender } from "@/hooks/useSkipFirstRender";
 import { digestPagination } from "@/utils/pagination";
-import { useVotingToken } from "@/plugins/tokenVoting/hooks/useVotingToken";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useRouter } from "next/router";
 import { deployment } from "@/ovc-indexer/contracts/deployment";
 import { defaultChain } from "@/config/wagmi-config";
+import DelegateModal from "../components/vote/delegate-modal";
+import { VerifiedContributorContract } from "@/ovc-indexer/contracts/VerifiedContributor";
 
 export default function Proposals() {
   const { isConnected } = useAccount();
@@ -37,6 +43,9 @@ export default function Proposals() {
     functionName: "proposalCount",
   });
 
+  const { writeContract: delegate } = useWriteContract();
+  const [showDelegateModal, SetShowDelegateModal] = useState(false);
+
   useEffect(() => {
     refetch();
   }, [blockNumber]);
@@ -56,7 +65,15 @@ export default function Proposals() {
         <h1 className="justify-self-start text-3xl font-semibold align-middle">
           Proposals
         </h1>
-        <div className="justify-self-end">
+        <div className="justify-self-end flex gap-x-1">
+          <Button
+            iconLeft={IconType.FAVORITE}
+            size="md"
+            variant="primary"
+            onClick={() => SetShowDelegateModal(true)}
+          >
+            Delegate
+          </Button>
           <If condition={canCreate && proposalCount}>
             <Link href="#/new">
               <Button iconLeft={IconType.PLUS} size="md" variant="primary">
@@ -132,6 +149,20 @@ export default function Proposals() {
             />
           </SectionView>
         </Else>
+      </If>
+      <If condition={showDelegateModal}>
+        <DelegateModal
+          onDismissModal={() => SetShowDelegateModal(false)}
+          onDelegate={(to) => {
+            delegate({
+              abi: VerifiedContributorContract.abi,
+              address: VerifiedContributorContract.address,
+              functionName: "delegate",
+              args: [to],
+            });
+            SetShowDelegateModal(false);
+          }}
+        />
       </If>
     </MainSection>
   );
