@@ -19,8 +19,8 @@ export default function Daos() {
           Departments
         </h1>
       </SectionView>
-      {visibleDaos.map((daoId) => (
-        <Link href={`#/${daos[daoId].dao}`} className="w-full mb-4">
+      {visibleDaos.map((daoId, i) => (
+        <Link key={i} href={`#/${daos[daoId].dao}`} className="w-full mb-4">
           <Card className="p-4">
             <div className="md:w-7/12 lg:w-3/4 xl:4/5 pr-4 text-nowrap text-ellipsis overflow-hidden">
               <h4 className="mb-1 text-lg text-neutral-300 line-clamp-1">

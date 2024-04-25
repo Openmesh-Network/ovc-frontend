@@ -26,8 +26,8 @@ export default function VotesSection({
                 vote.voteOption === 2
                   ? "Yes"
                   : vote.voteOption === 3
-                  ? "No"
-                  : "Abstain"
+                    ? "No"
+                    : "Abstain"
               }
             />
           </div>
@@ -56,7 +56,7 @@ const VoteCard = function ({
           <div className="px-2">
             <AddressText>{vote.voter}</AddressText>
             <p className="text-neutral-600 text-sm">
-              {compactNumber(formatUnits(vote.votingPower, 18))} votes
+              {BigInt(vote.votingPower).toString()} vote(s)
             </p>
           </div>
         </div>

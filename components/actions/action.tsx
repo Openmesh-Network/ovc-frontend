@@ -102,6 +102,60 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
             <PleaseWaitSpinner status="Loading the details" />
           </div>
         </Then>
+        <ElseIf condition={functionSignature.startsWith("performCall")}>
+          <div className="mt-3">
+            <div>
+              <h3 className="font-semibold">Call</h3>
+              <div className="grid gap-3 mt-3">
+                <ActionCard
+                  action={{
+                    to: args[0] as Address,
+                    value: args[1] as bigint,
+                    data: args[2] as Hex,
+                  }}
+                  idx={0}
+                />
+              </div>
+            </div>
+          </div>
+        </ElseIf>
+        <ElseIf condition={functionSignature.startsWith("performDelegateCall")}>
+          <div className="mt-3">
+            <div>
+              <h3 className="font-semibold">Delegate Call</h3>
+              <div className="grid gap-3 mt-3">
+                <ActionCard
+                  action={{
+                    to: args[0] as Address,
+                    value: BigInt(0),
+                    data: args[1] as Hex,
+                  }}
+                  idx={0}
+                />
+              </div>
+            </div>
+          </div>
+        </ElseIf>
+        <ElseIf condition={functionSignature.startsWith("multicall")}>
+          <div className="mt-3">
+            <div>
+              <h3 className="font-semibold">Multicall</h3>
+              <div className="grid gap-3 mt-3">
+                {args.map((arg, i) => (
+                  <ActionCard
+                    idx={i}
+                    key={i}
+                    action={{
+                      to: action.to,
+                      value: BigInt(0),
+                      data: arg as Hex,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </ElseIf>
         <ElseIf condition={args.length}>
           <div className="mt-3">
             <div>

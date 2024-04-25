@@ -1,4 +1,4 @@
-import { Address, PublicClient } from "viem";
+import { Address, PublicClient, zeroAddress } from "viem";
 import { whatsabi } from "@shazow/whatsabi";
 import { AbiFunction } from "abitype";
 import { useQuery } from "@tanstack/react-query";
@@ -33,9 +33,10 @@ export const useAbi = (
       staleTime: Infinity,
     });
 
-  const resolvedAddress = isAddress(implementationAddress)
-    ? implementationAddress
-    : contractAddress;
+  const resolvedAddress =
+    isAddress(implementationAddress) && implementationAddress !== zeroAddress
+      ? implementationAddress
+      : contractAddress;
 
   const {
     data: abi,
@@ -45,9 +46,6 @@ export const useAbi = (
     queryKey: ["abi", resolvedAddress || "", chainId],
     queryFn: () => {
       if (!resolvedAddress || !isAddress(resolvedAddress)) {
-        console.log("AH");
-        console.log(resolvedAddress);
-        console.log(publicClient);
         return Promise.resolve([]);
       }
 

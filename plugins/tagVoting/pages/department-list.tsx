@@ -18,8 +18,9 @@ export default function Departments() {
           Departments
         </h1>
       </SectionView>
-      {visibleDepartments.map((departmentId) => (
+      {visibleDepartments.map((departmentId, i) => (
         <Link
+          key={i}
           href={`#/${departments[departmentId].tag}`}
           className="w-full mb-4"
         >

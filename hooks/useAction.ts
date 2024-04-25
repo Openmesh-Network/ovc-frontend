@@ -13,7 +13,7 @@ import { defaultPublicClient } from "@/config/wagmi-config";
 type EvmValue = string | Hex | Address | number | bigint | boolean;
 
 export function useAction(action: Action) {
-  const { abi, isLoading } = useAbi(action.to as Address, defaultPublicClient);
+  const { abi, isLoading } = useAbi(action.to, defaultPublicClient);
   const [functionName, setFunctionName] = useState<string | null>(null);
   const [functionAbi, setFunctionAbi] = useState<AbiFunction | null>(null);
   const [actionArgs, setActionArgs] = useState<EvmValue[]>([]);
