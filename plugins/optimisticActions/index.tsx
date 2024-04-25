@@ -6,7 +6,6 @@ import { useUrl } from "@/hooks/useUrl";
 import { departments } from "@/ovc-indexer/contracts/departments";
 import Daos from "./pages/dao-list";
 import { Address, zeroHash } from "viem";
-import { VerifiedContributorTagTrustlessManagementContract } from "@/contracts/VerifiedContributorTagTrustlessManagement";
 import { deployment } from "@/ovc-indexer/contracts/deployment";
 import { AddressTrustlessManagementContract } from "@/contracts/AddressTrustlessManagement";
 import { OptimisticActionsContract } from "@/contracts/OptimisticActions";
@@ -19,8 +18,8 @@ export const daos = departments
       description: d.description as string,
       dao: d.smart_account as Address,
       tag: d.tag,
-      trustlessManagement:
-        VerifiedContributorTagTrustlessManagementContract.address as Address,
+      trustlessManagement: deployment.departments
+        .verifiedContributorTagTrustlessManagement as Address,
       role: BigInt(d.tag),
       templates: [ActionTemplate.DepartmentMemberPayment],
     };

@@ -1,5 +1,5 @@
 export const OptimisticActionsContract = {
-  address: "0x58D3618B97fDdc2aE66BC26EDE23582d407aCf03",
+  address: "0x67B5EA16b23ceB6c5A2D2a7142B6bD5127a971E1",
   abi: [
     {
       type: "function",
