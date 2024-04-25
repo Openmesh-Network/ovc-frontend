@@ -22,7 +22,7 @@ export default function ProposalCard(props: ProposalInputs) {
   const { data: optimisticAction } = useReadContract({
     abi: OptimisticActionsContract.abi,
     address: OptimisticActionsContract.address,
-    functionName: "getOptimsticAction",
+    functionName: "getOptimisticAction",
     args: [props.dao, props.id],
   });
 
