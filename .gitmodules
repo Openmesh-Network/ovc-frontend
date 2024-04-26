@@ -1,6 +1,6 @@
 [submodule "ovc-indexer"]
 	path = ovc-indexer
-	url = https://github.com/Plopmenz/ovc-indexer
+	url = https://github.com/Openmesh-Network/ovc-indexer
 [submodule "crosschain-account"]
 	path = crosschain-account
 	url = https://github.com/Plopmenz/crosschain-account
