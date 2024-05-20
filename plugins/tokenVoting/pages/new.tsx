@@ -108,14 +108,6 @@ export default function Create() {
         type: "error",
       });
 
-    if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-      return addAlert("Invalid proposal details", {
-        description:
-          "Please ensure that the values of the action to execute are complete and correct",
-        type: "error",
-      });
-    }
-
     const proposalMetadataJsonObject = { title, summary };
     const request: AddToIpfsRequest = {
       json: JSON.stringify(proposalMetadataJsonObject),
@@ -218,6 +210,13 @@ export default function Create() {
                         key={`${i}-${action.to}-${action.data}`}
                       >
                         <ActionCard action={action} idx={i} />
+                        <Button
+                          onClick={() => setActions(actions.toSpliced(i, 1))}
+                          variant="critical"
+                          className="w-full"
+                        >
+                          Remove action
+                        </Button>
                       </div>
                     ))}
                   </div>
