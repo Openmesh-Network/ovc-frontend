@@ -68,8 +68,8 @@ export function useProposal(
         args: {
           proposalId: proposalId,
         },
-        fromBlock: proposalData.parameters.snapshotBlock,
-        toBlock: proposalData.parameters.startDate,
+        fromBlock: proposalData.parameters.snapshotBlock + BigInt(1),
+        toBlock: proposalData.parameters.snapshotBlock + BigInt(1),
       })
       .then((logs) => {
         if (!logs || !logs.length) throw new Error("No creation logs");
