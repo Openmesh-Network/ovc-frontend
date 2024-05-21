@@ -16,7 +16,7 @@ const metadata = {
   icons: [appIcon],
 };
 
-export const projectId = "0ec5e8af894898c29bc27a1c4dc11e78" as const;
+export const projectId = "29c0627adb790bf289f42c4616efbce0" as const;
 export const chains = [polygon] as const;
 export const config = defaultWagmiConfig({
   chains,
