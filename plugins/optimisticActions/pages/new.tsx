@@ -225,7 +225,7 @@ export default function Create({
             <div className="mt-14 mb-6">
               <If not={actions.length}>
                 <Then>
-                  <p>Add the first action to continue</p>
+                  <p>No actions, advisory proposal.</p>
                 </Then>
                 <Else>
                   <p className="flex-grow text-lg text-neutral-900 font-semibold pb-3">
@@ -257,7 +257,6 @@ export default function Create({
                 className="mt-3"
                 size="lg"
                 variant="primary"
-                disabled={!actions.length}
                 onClick={() => submitProposal()}
               >
                 Submit proposal
