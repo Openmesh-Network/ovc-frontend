@@ -15,7 +15,7 @@ export default function Home() {
           Welcome to the Openmesh Verified Contributor Dashboard!
         </h1>
         <p className="text-md text-neutral-400">
-          Here you can participate in Openmesh Governance as Verified
+          Here you can participate in Openmesh Governance as a Verified
           Contributor. This includes all department DAOs. <br /> Do note that
           you will only be able to govern DAOs you are a member of.
         </p>
