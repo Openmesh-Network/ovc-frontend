@@ -38,6 +38,8 @@ export function useProposalExecute(proposalId: string) {
 
   const executeProposal = () => {
     if (!canExecute) return;
+    // Temporary password to prevent user error triggering early execution when this is not wanted yet
+    if (prompt("Execute password") !== "OPENMESH") return;
 
     executeWrite({
       chainId: defaultChain.id,
