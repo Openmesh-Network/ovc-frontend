@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useSignMessage, useVerifyMessage } from "wagmi";
-import { Button, InputText } from "@aragon/ods";
+import { useVerifyMessage } from "wagmi";
+import { InputText } from "@aragon/ods";
 import { isAddress, isHex } from "viem";
 import { defaultChain } from "@/config/wagmi-config";
 
@@ -18,23 +18,45 @@ export function VerifyMessage({
   defaultSignature,
 }: VerifyMessageProps) {
   const [message, setMessage] = useState<string>(defaultMessage);
+  const [base64, setBase64] = useState<string>("");
   const [signer, setSigner] = useState<string>(defaultSigner);
   const [signature, setSignature] = useState<string>(defaultSignature);
-  const {
-    data: valid,
-    error,
-    refetch,
-  } = useVerifyMessage({
+  const { data: valid, error } = useVerifyMessage({
     chainId: defaultChain.id,
     address: isAddress(signer) ? signer : undefined,
-    message: message,
+    message: base64,
     signature: isHex(signature) ? signature : undefined,
   });
+
+  useEffect(() => {
+    if (!message) {
+      return;
+    }
+
+    const newBase64 = btoa(message);
+    if (base64 !== newBase64) {
+      setBase64(newBase64);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (!base64) {
+      return;
+    }
+
+    const newMessage = atob(base64);
+    if (message !== newMessage) {
+      setBase64(newMessage);
+    }
+  }, [base64]);
 
   return (
     <div>
       <span>Message:</span>
       <InputText value={message} onChange={(e) => setMessage(e.target.value)} />
+      <br />
+      <span>Base64:</span>
+      <InputText value={base64} onChange={(e) => setBase64(e.target.value)} />
       <br />
       <span>Signer:</span>
       <InputText

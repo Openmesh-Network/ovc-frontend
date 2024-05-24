@@ -6,7 +6,9 @@ export default function SignPage() {
     <main className="w-screen max-w-full flex-col">
       <Card>
         <h1 className="text-2xl font-[700] text-neutral-800">Sign Message</h1>
-        <SignMessage defaultMessage="Verified Contributor Id 0 is granted to Samuel Mens." />
+        <SignMessage
+          defaultMessage={`Verified Contributor Id 0 is hereby known by the DAO to be granted to "Samuel Mens".`}
+        />
       </Card>
     </main>
   );

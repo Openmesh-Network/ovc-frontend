@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useSignMessage } from "wagmi";
 import { Button, InputText } from "@aragon/ods";
@@ -10,16 +10,22 @@ type SignMessageProps = {
 };
 export function SignMessage({ defaultMessage }: SignMessageProps) {
   const [message, setMessage] = useState<string>(defaultMessage);
+  const [base64, setBase64] = useState<string>("");
   const { data: signed, error, signMessageAsync } = useSignMessage();
+
+  useEffect(() => {
+    setBase64(btoa(message));
+  }, [message]);
 
   return (
     <div>
       <span>Message:</span>
       <InputText value={message} onChange={(e) => setMessage(e.target.value)} />
+      {base64 && <p>Base64: {base64}</p>}
       <br />
       <Button
         onClick={() => {
-          signMessageAsync({ message: message })?.catch(console.error);
+          signMessageAsync({ message: base64 })?.catch(console.error);
         }}
       >
         Sign
