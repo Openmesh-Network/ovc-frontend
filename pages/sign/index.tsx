@@ -7,7 +7,7 @@ export default function SignPage() {
       <Card>
         <h1 className="text-2xl font-[700] text-neutral-800">Sign Message</h1>
         <SignMessage
-          defaultMessage={`Verified Contributor Id 0 is hereby known by the DAO to be granted to "Samuel Mens".`}
+          defaultMessage={`Verified Contributor ID 0 is hereby known by the DAO to be granted to "Samuel Mens".`}
         />
       </Card>
     </main>

@@ -7,9 +7,9 @@ export default function VerifyPage() {
       <Card>
         <h1 className="text-2xl font-[700] text-neutral-800">Verify Message</h1>
         <VerifyMessage
-          defaultMessage={`Verified Contributor Id 0 is hereby known by the DAO to be granted to "Samuel Mens".`}
+          defaultMessage={`Verified Contributor ID 0 is hereby known by the DAO to be granted to "Samuel Mens".`}
           defaultSigner="0x519ce4C129a981B2CBB4C3990B1391dA24E8EbF3"
-          defaultSignature="0x2a5f374e63dc66742c170cc7ebe1fe5814dfe13f5ed77f062d614d305226b84949ef497380504c0ed15e32a175f28ba477de0c4968df32b09e896c15cc1b19f21b"
+          defaultSignature="0x3392aa47b184acf5648519607eb3a7c409ebb568207569fed92028f6552bda7d1ac7bc862528952c57f450f4a460a287a961255da35c9e3bae684f7d37171b561b"
         />
       </Card>
     </main>
