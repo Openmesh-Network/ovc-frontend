@@ -33,7 +33,7 @@ export function VerifyMessage({
       return;
     }
 
-    const newBase64 = btoa(message);
+    const newBase64 = Buffer.from(message).toString("base64");
     if (base64 !== newBase64) {
       setBase64(newBase64);
     }
@@ -44,9 +44,9 @@ export function VerifyMessage({
       return;
     }
 
-    const newMessage = atob(base64);
+    const newMessage = Buffer.from(base64, "base64").toString();
     if (message !== newMessage) {
-      setBase64(newMessage);
+      setMessage(newMessage);
     }
   }, [base64]);
 

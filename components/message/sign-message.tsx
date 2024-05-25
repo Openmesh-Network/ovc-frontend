@@ -14,7 +14,7 @@ export function SignMessage({ defaultMessage }: SignMessageProps) {
   const { data: signed, error, signMessageAsync } = useSignMessage();
 
   useEffect(() => {
-    setBase64(btoa(message));
+    setBase64(Buffer.from(message).toString("base64"));
   }, [message]);
 
   return (
