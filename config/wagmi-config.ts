@@ -3,7 +3,7 @@ import { cookieStorage, createStorage } from "wagmi";
 import { polygon, mainnet } from "wagmi/chains";
 
 import { siteConfig } from "./site";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http, webSocket } from "viem";
 
 export const appName = siteConfig.name;
 export const appDescription = siteConfig.description;
@@ -26,12 +26,16 @@ export const config = defaultWagmiConfig({
   storage: createStorage({
     storage: cookieStorage,
   }),
+  batch: { multicall: true },
+  transports: {
+    [polygon.id]: http("https://polygon-rpc.com"),
+  },
 });
 
 export const defaultChain = polygon;
 export const defaultPublicClient = createPublicClient({
   chain: defaultChain,
-  transport: http(),
+  transport: http("https://polygon-rpc.com"),
 });
 
 export const crosschainAccountChain = mainnet;
