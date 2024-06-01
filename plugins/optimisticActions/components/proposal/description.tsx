@@ -21,7 +21,7 @@ export default function ProposalDescription(proposal: IndexedActionRequest) {
   return (
     <div className="pt-2">
       <div
-        className="pb-6"
+        className="pb-6 prose"
         dangerouslySetInnerHTML={{
           __html: metadata.summary
             ? DOMPurify.sanitize(metadata.summary)

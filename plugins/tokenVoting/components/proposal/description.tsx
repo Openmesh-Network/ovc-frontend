@@ -9,7 +9,7 @@ export default function ProposalDescription(proposal: Proposal) {
   return (
     <div className="pt-2">
       <div
-        className="pb-6"
+        className="pb-6 prose"
         dangerouslySetInnerHTML={{
           __html: proposal.summary
             ? DOMPurify.sanitize(proposal.summary)
