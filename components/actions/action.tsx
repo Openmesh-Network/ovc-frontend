@@ -10,16 +10,19 @@ import {
   AbiParameter,
   Address,
   Hex,
+  decodeAbiParameters,
   formatEther,
   toFunctionSignature,
 } from "viem";
 import { compactNumber } from "@/utils/numbers";
 import { decodeCamelCase } from "@/utils/case";
 import { InputValue } from "@/utils/input-values";
+import { CCIPDeployments } from "@/crosschain-account/utils/ccip";
 
 type ActionCardProps = {
   action: Action;
   idx: number;
+  crossChain?: boolean;
 };
 type CallParameterFieldType =
   | string
@@ -31,8 +34,15 @@ type CallParameterFieldType =
   | CallParameterFieldType[]
   | { [k: string]: CallParameterFieldType };
 
-export const ActionCard = function ({ action, idx }: ActionCardProps) {
-  const { isLoading, args, functionName, functionAbi } = useAction(action);
+export const ActionCard = function ({
+  action,
+  idx,
+  crossChain,
+}: ActionCardProps) {
+  const { isLoading, args, functionName, functionAbi } = useAction(
+    action,
+    crossChain
+  );
 
   const isEthTransfer = !action.data || action.data === "0x";
 
@@ -114,6 +124,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
                     data: args[2] as Hex,
                   }}
                   idx={0}
+                  crossChain={crossChain}
                 />
               </div>
             </div>
@@ -131,6 +142,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
                     data: args[1] as Hex,
                   }}
                   idx={0}
+                  crossChain={crossChain}
                 />
               </div>
             </div>
@@ -150,9 +162,40 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
                       value: BigInt(0),
                       data: arg as Hex,
                     }}
+                    crossChain={crossChain}
                   />
                 ))}
               </div>
+            </div>
+          </div>
+        </ElseIf>
+        <ElseIf condition={functionSignature.startsWith("ccipSend")}>
+          <div className="mt-3">
+            <div>
+              <h3 className="font-semibold">CCIP Send</h3>
+              {functionSignature.startsWith("ccipSend") && (
+                <div className="grid gap-3 mt-3">
+                  <span>
+                    Chain:{" "}
+                    {getCCIPChainName(decodeCCIPCall(args).chainSelector)}
+                  </span>
+                  <span>To: {decodeCCIPCall(args).args.receiver}</span>
+                  <span>Paying with: {decodeCCIPCall(args).args.feeToken}</span>
+                  <span>
+                    Gas limit:{" "}
+                    {decodeCCIPCall(args).args.extraArgs[0].toString()}
+                  </span>
+                  <ActionCard
+                    action={{
+                      to: decodeCCIPCall(args).args.data[0],
+                      value: decodeCCIPCall(args).args.data[1],
+                      data: decodeCCIPCall(args).args.data[2],
+                    }}
+                    idx={0}
+                    crossChain={true}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </ElseIf>
@@ -226,6 +269,9 @@ function resolveValue(
   value: CallParameterFieldType,
   abi?: AbiParameter
 ): string {
+  if (value === undefined) {
+    return "Unknown";
+  }
   if (!abi?.type) {
     if (Array.isArray(value)) return value.join(", ");
     return value.toString();
@@ -242,7 +288,11 @@ function resolveValue(
     const components: AbiParameter[] = (abi as any).components || [];
 
     for (let i = 0; i < components.length; i++) {
-      const k = components[i].name!;
+      console.log("component", i, components[i]);
+      let k = components[i].name;
+      if (!k) {
+        k = i.toString(); // Needs to be a unique key as it will create an object (otherwise overwrite)
+      }
       result[k] = resolveValue((value as any)[k], components[i]);
     }
 
@@ -268,7 +318,9 @@ function resolveAddon(
 ): string {
   if (name) return name;
   else if (abiType) {
-    if (abiType === "address") {
+    if (abiType === "tuple") {
+      return "Tuple";
+    } else if (abiType === "address") {
       return "Address";
     } else if (abiType === "bytes32") {
       return "Identifier";
@@ -289,4 +341,52 @@ function getReadableJson(value: Record<string, InputValue>): string {
   const items = Object.keys(value).map((k) => k + ": " + value[k]);
 
   return "{ " + items.join(", ") + " }";
+}
+
+function decodeCCIPCall(args: any[]) {
+  const ccipArgs = args[1] as [Hex, Hex, [], Address, Hex];
+  return {
+    chainSelector: args[0] as bigint,
+    args: {
+      receiver: decodeAbiParameters([{ type: "address" }], ccipArgs[0]),
+      data: decodeAbiParameters(
+        [
+          { type: "address", name: "to" },
+          { type: "uint256", name: "value" },
+          { type: "bytes", name: "data" },
+        ],
+        ccipArgs[1]
+      ),
+      tokenAmounts: ccipArgs[2],
+      feeToken: ccipArgs[3],
+      extraArgs: decodeAbiParameters(
+        [{ type: "uint256", name: "gasLimit" }],
+        ccipArgs[4].replace("0x97a657c9", "0x") as Hex
+      ),
+    },
+  };
+}
+
+function getCCIPChainName(chainSelector: bigint): string {
+  const chainId = Object.keys(CCIPDeployments).find(
+    (chainId) =>
+      CCIPDeployments[chainId as any as keyof typeof CCIPDeployments]
+        .chainSelector === chainSelector
+  );
+  if (chainId === undefined) {
+    return `CCIP:${chainSelector}`;
+  }
+
+  switch (chainId) {
+    case "1":
+      return "Ethereum";
+    default:
+      return chainId;
+  }
+  // const chain = chains.find((c) => c.id === Number(chainId));
+  // if (!chain) {
+  //   return chainId;
+  // }
+
+  // return chain.name;
 }

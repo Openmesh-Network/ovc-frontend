@@ -8,12 +8,18 @@ import {
   toFunctionSelector,
 } from "viem";
 import { useAbi } from "./useAbi";
-import { defaultPublicClient } from "@/config/wagmi-config";
+import {
+  crosschainAccountPublicClient,
+  defaultPublicClient,
+} from "@/config/wagmi-config";
 
 type EvmValue = string | Hex | Address | number | bigint | boolean;
 
-export function useAction(action: Action) {
-  const { abi, isLoading } = useAbi(action.to, defaultPublicClient);
+export function useAction(action: Action, crossChain?: boolean) {
+  const { abi, isLoading } = useAbi(
+    action.to,
+    crossChain ? crosschainAccountPublicClient : defaultPublicClient
+  );
   const [functionName, setFunctionName] = useState<string | null>(null);
   const [functionAbi, setFunctionAbi] = useState<AbiFunction | null>(null);
   const [actionArgs, setActionArgs] = useState<EvmValue[]>([]);

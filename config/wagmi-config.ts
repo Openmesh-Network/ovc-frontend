@@ -3,7 +3,7 @@ import { cookieStorage, createStorage } from "wagmi";
 import { polygon, mainnet } from "wagmi/chains";
 
 import { siteConfig } from "./site";
-import { createPublicClient, http, webSocket } from "viem";
+import { createPublicClient, http } from "viem";
 
 export const appName = siteConfig.name;
 export const appDescription = siteConfig.description;
