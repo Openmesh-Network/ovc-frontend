@@ -7,7 +7,7 @@ import { createPublicClient, http } from "viem";
 
 export const appName = siteConfig.name;
 export const appDescription = siteConfig.description;
-export const appIcon = "https://ovc.openmesh.network/icon.png" as const;
+export const appIcon = "https://ovc.openmesh.network/icon.svg" as const;
 export const appUrl = "https://ovc.openmesh.network" as const;
 const metadata = {
   name: appName,

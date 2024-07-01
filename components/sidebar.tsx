@@ -50,7 +50,7 @@ const Sidebar = () => {
         <div className="w-full">
           <div className="w-full flex items-center pt-14 py-3 px-3 md:pt-6">
             <Image
-              src="/logo.png"
+              src="/icon.svg"
               width="60"
               height="60"
               className="w-8 my-1 mx-4"
