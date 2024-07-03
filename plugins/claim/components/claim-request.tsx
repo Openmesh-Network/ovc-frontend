@@ -25,7 +25,7 @@ export function ShowClaimRequest({ request }: { request: ClaimRequest }) {
       <span className="font-semibold text-xl">
         #{request.claimId}: {formatUnits(BigInt(request.amount), 18)} OPEN
       </span>
-      <span>{executed ? "executed" : request.type}</span>
+      <span>Status: {executed ? "executed" : request.type}</span>
       {!executed && request.type === "approved" && (
         <Button
           onClick={() => {

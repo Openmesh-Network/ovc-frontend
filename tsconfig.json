@@ -27,6 +27,7 @@
     "node_modules",
     "ovc-indexer",
     "crosschain-account",
-    "trustless-indexer"
+    "trustless-indexer",
+    "vesting-indexer"
   ]
 }

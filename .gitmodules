@@ -7,3 +7,6 @@
 [submodule "trustless-indexer"]
 	path = trustless-indexer
 	url = https://github.com/Plopmenz/trustless-indexer
+[submodule "vesting-indexer"]
+	path = vesting-indexer
+	url = https://github.com/Plopmenz/vesting-indexer
