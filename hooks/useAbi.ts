@@ -6,15 +6,6 @@ import { isAddress } from "@/utils/evm";
 import { useAlerts } from "@/context/Alerts";
 import { getImplementation, isProxyContract } from "@/utils/proxies";
 
-class AddressString extends String {
-  address: Address;
-
-  constructor(value: Address) {
-    super(value);
-    this.address = value;
-  }
-}
-
 export const useAbi = (
   contractAddress: Address,
   publicClient: PublicClient
@@ -59,7 +50,7 @@ export const useAbi = (
       }
 
       return whatsabi
-        .autoload(new AddressString(resolvedAddress) as any as string, {
+        .autoload(resolvedAddress, {
           provider: publicClient,
           abiLoader: getEtherscanAbiLoader(chainId),
           followProxies: false,
