@@ -28,16 +28,16 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Add a new alert to the list
   const addAlert = (message: string, alertOptions?: AlertOptions) => {
-    // Clean duplicates
-    const idx = alerts.findIndex((a) => {
-      if (a.message !== message) return false;
-      else if (a.description !== alertOptions?.description) return false;
-      else if (a.type !== alertOptions?.type) return false;
-      return true;
-    });
-    if (idx >= 0) {
-      // Update the existing one
-      setAlerts((curAlerts) => {
+    setAlerts((curAlerts) => {
+      // Clean duplicates
+      const idx = curAlerts.findIndex((a) => {
+        if (a.message !== message) return false;
+        else if (a.description !== alertOptions?.description) return false;
+        else if (a.type !== alertOptions?.type) return false;
+        return true;
+      });
+      if (idx >= 0) {
+        // Update the existing one
         const [prevAlert] = curAlerts.splice(idx, 1);
         clearTimeout(prevAlert.dismissTimeout);
         const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
@@ -46,26 +46,27 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
           timeout
         );
         return curAlerts.concat(prevAlert);
-      });
-      return;
-    }
+      }
 
-    const newAlert: IAlert = {
-      id: Date.now(),
-      message,
-      description: alertOptions?.description,
-      type: alertOptions?.type ?? "info",
-    };
-    if (alertOptions?.txHash && client) {
-      newAlert.explorerLink =
-        client.chain.blockExplorers?.default.url + "/tx/" + alertOptions.txHash;
-    }
-    const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
-    newAlert.dismissTimeout = setTimeout(
-      () => removeAlert(newAlert.id),
-      timeout
-    );
-    setAlerts((curAlerts) => curAlerts.concat(newAlert));
+      const newAlert: IAlert = {
+        id: Date.now(),
+        message,
+        description: alertOptions?.description,
+        type: alertOptions?.type ?? "info",
+      };
+      if (alertOptions?.txHash && client) {
+        newAlert.explorerLink =
+          client.chain.blockExplorers?.default.url +
+          "/tx/" +
+          alertOptions.txHash;
+      }
+      const timeout = alertOptions?.timeout ?? DEFAULT_ALERT_TIMEOUT;
+      newAlert.dismissTimeout = setTimeout(
+        () => removeAlert(newAlert.id),
+        timeout
+      );
+      return curAlerts.concat(newAlert);
+    });
   };
 
   // Function to remove an alert

@@ -279,7 +279,10 @@ export default function Create({
               <ActionTemplateForm
                 dao={smartAccount}
                 tag={tag}
-                templates={[ActionTemplate.AddDepartmentMember]}
+                templates={[
+                  ActionTemplate.AddDepartmentMember,
+                  ActionTemplate.TokenBridge,
+                ]}
                 onAddActions={async (a) =>
                   setActions(
                     actions.concat(

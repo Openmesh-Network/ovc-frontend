@@ -146,7 +146,7 @@ export const InputDepartmentMemberPayment: FC<
       return;
     }
 
-    setAmounts(task.budget.map((_) => "0")); // Initialize a 0 amount for each token
+    setAmounts(task.budget.map(() => "0")); // Initialize a 0 amount for each token
   }, [task?.budget]);
 
   const { data: decimals } = useReadContracts({

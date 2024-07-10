@@ -6,6 +6,15 @@ import { isAddress } from "@/utils/evm";
 import { useAlerts } from "@/context/Alerts";
 import { getImplementation, isProxyContract } from "@/utils/proxies";
 
+class AddressString extends String {
+  address: Address;
+
+  constructor(value: Address) {
+    super(value);
+    this.address = value;
+  }
+}
+
 export const useAbi = (
   contractAddress: Address,
   publicClient: PublicClient
@@ -15,7 +24,7 @@ export const useAbi = (
 
   const { data: implementationAddress, isLoading: isLoadingImpl } =
     useQuery<Address | null>({
-      queryKey: ["proxy-check", contractAddress, chainId],
+      queryKey: ["proxy-check", contractAddress, chainId, publicClient],
       queryFn: () => {
         if (!contractAddress) return null;
 
@@ -43,18 +52,19 @@ export const useAbi = (
     isLoading,
     error,
   } = useQuery<AbiFunction[], Error>({
-    queryKey: ["abi", resolvedAddress || "", chainId],
+    queryKey: ["abi", resolvedAddress || "", chainId, publicClient],
     queryFn: () => {
       if (!resolvedAddress || !isAddress(resolvedAddress)) {
         return Promise.resolve([]);
       }
 
       return whatsabi
-        .autoload(resolvedAddress, {
+        .autoload(new AddressString(resolvedAddress) as any as string, {
           provider: publicClient,
           abiLoader: getEtherscanAbiLoader(chainId),
           followProxies: false,
           enableExperimentalMetadata: true,
+          onProgress: console.log,
         })
         .then(({ abi }) => {
           const functionItems: AbiFunction[] = [];
@@ -108,19 +118,41 @@ export const useAbi = (
 function getEtherscanAbiLoader(chainId: number) {
   switch (chainId) {
     case 1:
-      return new whatsabi.loaders.EtherscanABILoader();
+      return new whatsabi.loaders.MultiABILoader([
+        // new whatsabi.loaders.SourcifyABILoader({
+        //   chainId: chainId,
+        // }),
+        new whatsabi.loaders.EtherscanABILoader({
+          baseURL: "https://api.etherscan.io/api",
+        }),
+      ]);
     case 137:
-      return new whatsabi.loaders.EtherscanABILoader({
-        baseURL: "https://api.polygonscan.com/api",
-      });
+      return new whatsabi.loaders.MultiABILoader([
+        // new whatsabi.loaders.SourcifyABILoader({
+        //   chainId: chainId,
+        // }),
+        new whatsabi.loaders.EtherscanABILoader({
+          baseURL: "https://api.polygonscan.com/api",
+        }),
+      ]);
     case 421614:
-      return new whatsabi.loaders.EtherscanABILoader({
-        baseURL: "https://api-sepolia.arbiscan.io/api",
-      });
+      return new whatsabi.loaders.MultiABILoader([
+        // new whatsabi.loaders.SourcifyABILoader({
+        //   chainId: chainId,
+        // }),
+        new whatsabi.loaders.EtherscanABILoader({
+          baseURL: "https://api-sepolia.arbiscan.io/api",
+        }),
+      ]);
     case 11155111:
-      return new whatsabi.loaders.EtherscanABILoader({
-        baseURL: "https://api-sepolia.etherscan.io/api",
-      });
+      return new whatsabi.loaders.MultiABILoader([
+        // new whatsabi.loaders.SourcifyABILoader({
+        //   chainId: chainId,
+        // }),
+        new whatsabi.loaders.EtherscanABILoader({
+          baseURL: "https://api-sepolia.etherscan.io/api",
+        }),
+      ]);
     default:
       throw new Error("Unknown chain");
   }

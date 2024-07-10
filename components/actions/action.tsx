@@ -72,6 +72,10 @@ export const ActionCard = function ({
     ? toFunctionSignature(functionAbi).replace(/,/g, ", ")
     : "";
 
+  const ccipCall = functionSignature.startsWith("ccipSend")
+    ? decodeCCIPCall(args)
+    : undefined;
+
   return (
     <Card>
       <div className="w-full flex flex-row space-x-10 justify-between">
@@ -173,27 +177,38 @@ export const ActionCard = function ({
           <div className="mt-3">
             <div>
               <h3 className="font-semibold">CCIP Send</h3>
-              {functionSignature.startsWith("ccipSend") && (
+              {ccipCall && (
                 <div className="grid gap-3 mt-3">
+                  <span>Chain: {getCCIPChainName(ccipCall.chainSelector)}</span>
+                  <span>To: {ccipCall.args.receiver}</span>
+                  <span>Paying with: {ccipCall.args.feeToken}</span>
                   <span>
-                    Chain:{" "}
-                    {getCCIPChainName(decodeCCIPCall(args).chainSelector)}
+                    Gas limit: {ccipCall.args.extraArgs[0].toString()}
                   </span>
-                  <span>To: {decodeCCIPCall(args).args.receiver}</span>
-                  <span>Paying with: {decodeCCIPCall(args).args.feeToken}</span>
-                  <span>
-                    Gas limit:{" "}
-                    {decodeCCIPCall(args).args.extraArgs[0].toString()}
-                  </span>
-                  <ActionCard
-                    action={{
-                      to: decodeCCIPCall(args).args.data[0],
-                      value: decodeCCIPCall(args).args.data[1],
-                      data: decodeCCIPCall(args).args.data[2],
-                    }}
-                    idx={0}
-                    crossChain={true}
-                  />
+                  {ccipCall.args.tokenAmounts.length !== 0 && (
+                    <div>
+                      <span>Token transfers:</span>
+                      <div className="pl-2">
+                        {ccipCall.args.tokenAmounts.map((tokenTransfer) => (
+                          <span>
+                            <strong>{tokenTransfer[0]}: </strong>
+                            {tokenTransfer[1].toString()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {ccipCall.args.data && (
+                    <ActionCard
+                      action={{
+                        to: ccipCall.args.data[0],
+                        value: ccipCall.args.data[1],
+                        data: ccipCall.args.data[2],
+                      }}
+                      idx={0}
+                      crossChain={true}
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -344,19 +359,22 @@ function getReadableJson(value: Record<string, InputValue>): string {
 }
 
 function decodeCCIPCall(args: any[]) {
-  const ccipArgs = args[1] as [Hex, Hex, [], Address, Hex];
+  const ccipArgs = args[1] as [Hex, Hex, [Address, bigint][], Address, Hex];
   return {
     chainSelector: args[0] as bigint,
     args: {
       receiver: decodeAbiParameters([{ type: "address" }], ccipArgs[0]),
-      data: decodeAbiParameters(
-        [
-          { type: "address", name: "to" },
-          { type: "uint256", name: "value" },
-          { type: "bytes", name: "data" },
-        ],
-        ccipArgs[1]
-      ),
+      data:
+        ccipArgs[1] === "0x"
+          ? undefined
+          : decodeAbiParameters(
+              [
+                { type: "address", name: "to" },
+                { type: "uint256", name: "value" },
+                { type: "bytes", name: "data" },
+              ],
+              ccipArgs[1]
+            ),
       tokenAmounts: ccipArgs[2],
       feeToken: ccipArgs[3],
       extraArgs: decodeAbiParameters(

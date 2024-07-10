@@ -9,7 +9,6 @@ import {
 } from "viem";
 import { Button, Dropdown, InputText, TextAreaRichText } from "@aragon/ods";
 import { Action } from "@/utils/types";
-import { parseBigInt } from "@/utils/bigint";
 import { VerifiedContributorTagManagerContract } from "@/ovc-indexer/contracts/VerifiedContributorTagManager";
 import { TasksContract } from "@/ovc-indexer/openrd-indexer/contracts/Tasks";
 import { deployment } from "@/ovc-indexer/contracts/deployment";

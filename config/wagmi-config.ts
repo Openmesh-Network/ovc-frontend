@@ -30,6 +30,9 @@ export const config = defaultWagmiConfig({
   transports: {
     [polygon.id]: http("https://polygon-rpc.com"),
   },
+  auth: {
+    email: false,
+  },
 });
 
 export const defaultChain = polygon;
