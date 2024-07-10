@@ -18,12 +18,6 @@ export const plugins: PluginItem[] = [
     icon: IconType.CALENDAR,
   },
   {
-    id: "claim",
-    folderName: "claim",
-    title: "Claim",
-    icon: IconType.SUCCESS,
-  },
-  {
     id: "token-voting",
     folderName: "tokenVoting",
     title: "Verified Contributor Voting",

@@ -144,13 +144,30 @@ const MenuList = ({
         className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
       >
         <Link
+          href={siteConfig.links.rewards}
+          target="_blank"
+          className="flex items-center w-full p-3"
+        >
+          <Icon
+            className="mr-2"
+            icon={IconType.DEPOSIT}
+            size="md"
+            responsiveSize={{ md: "lg" }}
+          />
+          <span className="block py-2 pr-4 pl-3 lg:p-0">Rewards</span>
+        </Link>
+      </li>
+      <li
+        className={`flex w-full justify-between text-neutral-700 cursor-pointer items-center mb-2 rounded-lg shadow-lg hover:bg-neutral-100 md:hover:bg-neutral-200`}
+      >
+        <Link
           href={siteConfig.links.circle}
           target="_blank"
           className="flex items-center w-full p-3"
         >
           <Icon
             className="mr-2"
-            icon={IconType.HELP}
+            icon={IconType.APP_MEMBERS}
             size="md"
             responsiveSize={{ md: "lg" }}
           />

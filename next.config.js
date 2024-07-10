@@ -31,10 +31,6 @@ const nextConfig = {
       source: "/trustless-indexer/:call*",
       destination: "https://trustless.management/indexer/:call*",
     },
-    {
-      source: "/vesting-indexer/:call*",
-      destination: "https://vesting.plopmenz.com/indexer/:call*",
-    },
   ],
   reactStrictMode: true,
 };
