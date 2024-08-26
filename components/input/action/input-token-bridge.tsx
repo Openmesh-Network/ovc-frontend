@@ -4,6 +4,8 @@ import {
   encodeAbiParameters,
   encodeFunctionData,
   isAddress,
+  maxUint256,
+  parseAbi,
   parseUnits,
 } from "viem";
 import { Button, InputText } from "@aragon/ods";
@@ -19,7 +21,8 @@ export const InputTokenBridge: FC<InputTokenBridgeProps> = ({
   onAddActions,
 }) => {
   const [token] = useState<string>(
-    CCIPDeployments[defaultChain.id].feeTokens.link
+    "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359" // USDC
+    // CCIPDeployments[defaultChain.id].feeTokens.link
   );
   const [bridgeTo, setBridgeTo] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
@@ -37,7 +40,7 @@ export const InputTokenBridge: FC<InputTokenBridgeProps> = ({
 
     let amountBigint: bigint;
     try {
-      amountBigint = parseUnits(amount, 18);
+      amountBigint = parseUnits(amount, 6);
     } catch {
       console.error(`Invalid value for amount: ${amount}`);
       return;
@@ -71,8 +74,26 @@ export const InputTokenBridge: FC<InputTokenBridgeProps> = ({
         ],
       }),
     };
+    const approveLink = {
+      to: CCIPDeployments[defaultChain.id].feeTokens.link,
+      value: BigInt(0),
+      data: encodeFunctionData({
+        abi: parseAbi(["function approve(address spender, uint256 amount)"]),
+        functionName: "approve",
+        args: [CCIPDeployments[defaultChain.id].router, maxUint256],
+      }),
+    };
+    const approveToken = {
+      to: token,
+      value: BigInt(0),
+      data: encodeFunctionData({
+        abi: parseAbi(["function approve(address spender, uint256 amount)"]),
+        functionName: "approve",
+        args: [CCIPDeployments[defaultChain.id].router, amountBigint],
+      }),
+    };
 
-    onAddActions([action]);
+    onAddActions([approveLink, approveToken, action]);
     setBridgeTo("");
     setAmount("");
   };
@@ -81,7 +102,7 @@ export const InputTokenBridge: FC<InputTokenBridgeProps> = ({
     <div className="my-6">
       <div className="mb-3">
         <InputText
-          label={`Amount of LINK`}
+          label={`Amount of tokens`}
           placeholder="123.45"
           variant={
             !amount || !Number.isNaN(Number(amount)) ? "default" : "critical"
@@ -92,7 +113,7 @@ export const InputTokenBridge: FC<InputTokenBridgeProps> = ({
           }}
         />
         <InputText
-          label="Bridge to (Ethereum)"
+          label="Receiver address (Ethereum)"
           placeholder="0x1234..."
           variant={!bridgeTo || isAddress(bridgeTo) ? "default" : "critical"}
           value={bridgeTo}

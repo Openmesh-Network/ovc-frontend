@@ -69,7 +69,7 @@ export const ActionTemplateForm: FC<ActionTemplateFormProps> = ({
             <Dropdown.Item
               onSelect={() => setActionTemplate(ActionTemplate.TokenBridge)}
             >
-              Bridge LINK
+              Bridge Tokens
             </Dropdown.Item>
           )}
         </Dropdown.Container>
